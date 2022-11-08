@@ -1,5 +1,5 @@
 package cz.uhk.pproproject.model;
 
-public enum CompanyPosition {
+public enum CompanyPositionEnum {
     Employee,Manager,Owner
 }
