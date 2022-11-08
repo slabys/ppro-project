@@ -19,29 +19,18 @@ import java.util.List;
 public class UserController {
     @Autowired
     private UserRepository userRepo;
-    // User login
-    @GetMapping("/login")
-    public String loginGet(){
-        return "login";
-    }
-
-    @PostMapping("/login")
-    public void loginPost(Model m, @ModelAttribute User loginPerson, HttpServletResponse resp) throws IOException {
-
-        //TODO: add verification and redirect to correct page
-        resp.sendRedirect("/login");
-    }
 
     // User activation
-    @GetMapping("/activateUser/{id}")
-    public String activateUser(@PathVariable Long id){
+    @GetMapping("/activateUser/{token}")
+    public String activateUser(@PathVariable String token){
+        //TODO: check if UserActivationToken exists, check if user is not active, user registration form - set password all additional info -> post to /activateUser
         return "activateUserForm";
     }
 
     @PostMapping("/activateUser")
     public void activateUserPost(Model m, @ModelAttribute User userToActivate, HttpServletResponse resp) throws IOException {
 
-        //TODO: add verification, insert user into db and redirect
+        //TODO: add validation of data, update user in db (activate), add hashed password
         resp.sendRedirect("/mainPage");
     }
 
@@ -54,14 +43,20 @@ public class UserController {
 
     @PostMapping("/registerUser")
     public String processRegister(User user) {
+        //add user to db
+        //add email to db
+        //send email to user
+        //generate link for user activation -> registration with pass and additional info
+
+        /*
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String encodedPassword = passwordEncoder.encode(user.getPassword());
 
         //TODO set this for our auth
         user.setPassword(encodedPassword);
+        */
 
         userRepo.save(user);
-
         return "registerSuccessfull";
     }
 
