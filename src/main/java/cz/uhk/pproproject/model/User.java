@@ -1,9 +1,10 @@
 package cz.uhk.pproproject.model;
 
 import javax.persistence.*;
-import java.util.ArrayList;
+import java.util.Set;
 
 @Entity
+@Table(name="user")
 public class User {
 
     @Id
@@ -25,18 +26,40 @@ public class User {
     public void setUsername(String username) {
         this.username = username;
     }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    @Column(nullable = false, unique = true, length = 45)
+    private String email;
     @Column
     private String username;
-    @Column
+    @Column(nullable = false, length = 20)
     private String firstName;
-    @Column
+    @Column(nullable = false, length = 20)
     private String lastName;
     @Column
     private String password;
     @Column
     private float salary;
     @Column
-    private CompanyPosition role;
+    private CompanyPositionEnum role;
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    @Column
+    private boolean active;
 
     public String getFirstName() {
         return firstName;
@@ -70,23 +93,26 @@ public class User {
         this.salary = salary;
     }
 
-    public CompanyPosition getRole() {
+    public CompanyPositionEnum getRole() {
         return role;
     }
 
-    public void setRole(CompanyPosition role) {
+    public void setRole(CompanyPositionEnum role) {
         this.role = role;
     }
 
-    public ArrayList<Project> getAssignedProjects() {
+/*
+    public Set<Project> getAssignedProjects() {
         return assignedProjects;
     }
 
-    public void setAssignedProjects(ArrayList<Project> assignedProjects) {
+    public void setAssignedProjects(Set<Project> assignedProjects) {
         this.assignedProjects = assignedProjects;
     }
 
     @Column
     @ManyToMany()
-    private ArrayList<Project> assignedProjects;
+    private Set<Project> assignedProjects;
+*/
 }
+
