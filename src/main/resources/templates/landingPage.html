@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/layout}">
 <head>
     <meta charset="UTF-8">
     <title>PPRO Project</title>
 </head>
 <body>
-<div class="container text-center">
+<section layout:fragment="content" class="container text-center">
     <h1>Welcome to CodeJava.net</h1>
     <h3><a th:href="@{/users}">List of Users</a></h3>
     <h3><a th:href="@{/registerUser}">Register</a></h3>
     <h3><a th:href="@{/login}">Login</a></h3>
-</div>
+</section>
 </body>
 </html>
