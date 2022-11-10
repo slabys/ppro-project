@@ -1,5 +1,6 @@
-package cz.uhk.pproproject.middleware;
+package cz.uhk.pproproject.service;
 
+import cz.uhk.pproproject.middleware.CustomUserDetails;
 import cz.uhk.pproproject.model.User;
 import cz.uhk.pproproject.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
