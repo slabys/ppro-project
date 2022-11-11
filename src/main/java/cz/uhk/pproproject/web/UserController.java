@@ -1,8 +1,11 @@
 package cz.uhk.pproproject.web;
 
+import cz.uhk.pproproject.middleware.CustomUserDetails;
 import cz.uhk.pproproject.model.User;
 import cz.uhk.pproproject.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,6 +16,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.security.AuthProvider;
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -48,23 +53,30 @@ public class UserController {
         //send email to user
         //generate link for user activation -> registration with pass and additional info
 
-        /*
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String encodedPassword = passwordEncoder.encode(user.getPassword());
 
         //TODO set this for our auth
         user.setPassword(encodedPassword);
-        */
 
         userRepo.save(user);
         return "registerSuccessfull";
     }
 
     @GetMapping("/users")
-    public String listUsers(Model model) {
+    public String listUsers(Model model, Authentication auth) {
         List<User> listUsers = userRepo.findAll();
         model.addAttribute("listUsers", listUsers);
 
+        /* GET USER IN CONTROLLER
+        CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+        System.out.println(userDetails.getUser().getFirstName());
+        */
         return "users";
+    }
+
+    @GetMapping("/login")
+    public String login(){
+        return "login";
     }
 }
