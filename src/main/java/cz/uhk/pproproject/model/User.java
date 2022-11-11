@@ -1,22 +1,19 @@
 package cz.uhk.pproproject.model;
 
 import javax.persistence.*;
-import java.util.Set;
 
 @Entity
-@Table(name="user")
-public class User {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    public void setId(Long id) {
-        this.id = id;
+public class User extends BaseModel{
+    public User(String email, String username, String firstName, String lastName, RoleEnum role) {
+        this.email = email;
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.role = role;
     }
 
-    public Long getId() {
-        return id;
+    public User() {
+
     }
 
     public String getUsername() {
@@ -47,8 +44,7 @@ public class User {
     private String password;
     @Column
     private float salary;
-    @Column
-    private CompanyPositionEnum role;
+
 
     public boolean isActive() {
         return active;
@@ -93,13 +89,17 @@ public class User {
         this.salary = salary;
     }
 
-    public CompanyPositionEnum getRole() {
+    public RoleEnum getRole() {
         return role;
     }
 
-    public void setRole(CompanyPositionEnum role) {
+    public void setRole(RoleEnum role) {
         this.role = role;
     }
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RoleEnum role;
 
 /*
     public Set<Project> getAssignedProjects() {

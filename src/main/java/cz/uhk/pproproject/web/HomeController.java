@@ -15,4 +15,9 @@ public class HomeController {
     public String home(Model m){
         return "landingPage";
     }
+
+    @GetMapping("/403")
+    public String accessDenied(Model m){
+        return "errors/403";
+    }
 }
