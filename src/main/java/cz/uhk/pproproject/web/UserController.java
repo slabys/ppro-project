@@ -15,14 +15,11 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.transaction.Transactional;
@@ -69,7 +66,7 @@ public class UserController {
     @Transactional
     public String activateUserPost(Model m, User user,RedirectAttributes redirectAttrs) throws IOException {
 
-        //TODO: add validation of data, update user in db (activate), add hashed password
+        //TODO: add validation of data
         User updateUser = (User) userRepo.findByEmail(user.getEmail());
         updateUser.setActive(true);
         UserActivationToken uat = uatRepo.findActiveByUser(updateUser);
@@ -77,14 +74,14 @@ public class UserController {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         updateUser.setPassword(encodedPassword);
-
-        //TODO email edit link
-        Email tokenEmail = new Email("New account on Employerr platform was successfully activated!", "no-reply@employerr.com", "Your account was successfully activated. Please revise your data. If there is something incorrect contact owner of company to update your data.", user);
-        emailRepo.save(tokenEmail);
-        //TODO: send email about successful activation
-
         userRepo.save(updateUser);
         uatRepo.save(uat);
+
+        //TODO email edit link
+        Email successEmail = new Email("New account on Employerr platform was successfully activated!", "no-reply@employerr.com", "Your account was successfully activated. Please revise your data. If there is something incorrect contact owner of company to update your data.", updateUser);
+        emailRepo.save(successEmail);
+        //TODO: send email about successful activation
+
         redirectAttrs.addFlashAttribute("info","Activation was successful");
         return "redirect:/";
     }
@@ -97,9 +94,13 @@ public class UserController {
         RoleHierarchyImpl roleHierarchy = RoleEnum.getRoleHierarchy();
             CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
 
-            Collection<? extends GrantedAuthority> roles = Collections.singletonList(new SimpleGrantedAuthority(("ROLE_"+userDetails.getUser().getRole().toString())));
+            Collection<? extends GrantedAuthority> roles = Collections.singletonList(new SimpleGrantedAuthority((userDetails.getUser().getRoleWithPrefix())));
             Collection<GrantedAuthority> ga = roleHierarchy.getReachableGrantedAuthorities(roles);
-            model.addAttribute("reachableRoles", ga);
+            Collection<RoleEnum> reachableRoles = new ArrayList<RoleEnum>();
+            for (GrantedAuthority role: ga) {
+                reachableRoles.add(RoleEnum.getRoleWithoutPrefix(role.toString()));
+            }
+            model.addAttribute("reachableRoles", reachableRoles);
 
         return "signupEmployee";
     }
@@ -107,7 +108,7 @@ public class UserController {
     @Transactional
     @PostMapping("/registerUser")
     public String processRegister(Model m, User user, RedirectAttributes redirectAttrs) throws IOException {
-
+        System.out.println(user.getRole());
         User userSearch = userRepo.findByEmail(user.getEmail());
         if(userSearch != null && userSearch.isActive()){
             redirectAttrs.addFlashAttribute("error", "User is already active!");
@@ -118,7 +119,6 @@ public class UserController {
             Calendar c = Calendar.getInstance();
             c.add(Calendar.DATE, expirationDays);  // number of days to add
             if (activeToken == null) {
-                user.setRole(RoleEnum.EMPLOYEE);
                 user.setActive(false);
                 userRepo.save(user);
                 UserActivationToken uat = new UserActivationToken(user, UUID.randomUUID().toString(), c.getTime());
