@@ -1,11 +1,14 @@
 package cz.uhk.pproproject.middleware;
 
+import cz.uhk.pproproject.model.RoleEnum;
 import cz.uhk.pproproject.model.User;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class CustomUserDetails implements UserDetails {
@@ -18,7 +21,11 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        List<GrantedAuthority> list = new ArrayList<GrantedAuthority>();
+
+        list.add(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
+
+        return list;
     }
 
     @Override
@@ -48,8 +55,14 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return user.isActive();
     }
+
+    public User getUser(){
+        return user;
+    }
+
+    public RoleEnum getRole() { return user.getRole(); }
 
     public String getFullName() {
         return user.getFirstName() + " " + user.getLastName();

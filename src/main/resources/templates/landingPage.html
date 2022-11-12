@@ -1,15 +1,27 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/layout}">
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/layout}">
 <head>
     <meta charset="UTF-8">
     <title>PPRO Project</title>
 </head>
 <body>
 <section layout:fragment="content" class="container text-center">
-    <h1>Welcome to CodeJava.net</h1>
+    <h1>Welcome to Employerr</h1>
+    <div sec:authorize="isAuthenticated()"><h2>Logged user: </h2> <span sec:authentication="principal.fullName">User fullname</span> (<span sec:authentication="principal.role">role</span>)</div>
+    <div class="alert alert-primary" role="alert" th:text="${info}" th:if="${info}"></div>
+    <div class="alert alert-danger" role="alert" th:text="${error}" th:if="${error}"></div>
     <h3><a th:href="@{/users}">List of Users</a></h3>
+
+    <div sec:authorize="isAuthenticated()">
     <h3><a th:href="@{/registerUser}">Register</a></h3>
-    <h3><a th:href="@{/login}">Login</a></h3>
+    </div>
+
+    <div sec:authorize="isAuthenticated()">
+       <h3><a th:href="@{/logout}">Log out</a></h3>
+    </div>
+    <div sec:authorize="isAnonymous()">
+        <h3><a th:href="@{/login}">Log in</a></h3>
+    </div>
 </section>
 </body>
 </html>

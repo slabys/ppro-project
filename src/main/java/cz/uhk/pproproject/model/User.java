@@ -1,31 +1,18 @@
 package cz.uhk.pproproject.model;
 
 import javax.persistence.*;
-import java.util.Set;
 
 @Entity
-@Table(name="user")
-public class User {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    public void setId(Long id) {
-        this.id = id;
+public class User extends BaseModel{
+    public User(String email, String firstName, String lastName, RoleEnum role) {
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.role = role;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
+    public User() {}
 
     public String getEmail() {
         return email;
@@ -37,8 +24,6 @@ public class User {
 
     @Column(nullable = false, unique = true, length = 45)
     private String email;
-    @Column
-    private String username;
     @Column(nullable = false, length = 20)
     private String firstName;
     @Column(nullable = false, length = 20)
@@ -47,8 +32,7 @@ public class User {
     private String password;
     @Column
     private float salary;
-    @Column
-    private CompanyPositionEnum role;
+
 
     public boolean isActive() {
         return active;
@@ -93,13 +77,17 @@ public class User {
         this.salary = salary;
     }
 
-    public CompanyPositionEnum getRole() {
+    public RoleEnum getRole() {
         return role;
     }
 
-    public void setRole(CompanyPositionEnum role) {
+    public void setRole(RoleEnum role) {
         this.role = role;
     }
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RoleEnum role;
 
 /*
     public Set<Project> getAssignedProjects() {
