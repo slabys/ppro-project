@@ -3,13 +3,14 @@ package cz.uhk.pproproject.model;
 import javax.persistence.*;
 import java.util.Date;
 
+@MappedSuperclass
 public abstract class BaseModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(updatable = false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON CREATE CURRENT_TIMESTAMP")
+    @Column(updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date createdAt;
 
     @Temporal(TemporalType.TIMESTAMP)

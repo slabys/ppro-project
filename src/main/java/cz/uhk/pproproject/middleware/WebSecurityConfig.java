@@ -1,7 +1,9 @@
 package cz.uhk.pproproject.middleware;
 
+import cz.uhk.pproproject.model.RoleEnum;
 import cz.uhk.pproproject.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.expression.SecurityExpressionHandler;
@@ -16,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -36,17 +39,18 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((requests) -> requests
-                        .antMatchers("/", "/home").permitAll()
-                        .anyRequest().authenticated()
+                        .antMatchers("/users").authenticated()
+                        .anyRequest().permitAll()
                 )
                 .formLogin((form) -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
                         .usernameParameter("email")
-                        .defaultSuccessUrl("/users",true)
+                        .defaultSuccessUrl("/",true)
                         .permitAll()
                 )
-                .logout((logout) -> logout.permitAll().logoutSuccessUrl("/"))
+                .logout((logout) -> logout.permitAll().logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET")).logoutSuccessUrl("/").invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID"))
                 .csrf()
                 .and()
                 .rememberMe().tokenValiditySeconds(1209600)
@@ -58,9 +62,7 @@ public class WebSecurityConfig {
 
     @Bean
     public RoleHierarchyImpl roleHierarchy() {
-        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
-        roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_OWNER \n ROLE_OWNER > ROLE_MANAGER \n ROLE_MANAGER > ROLE_EMPLOYEE");
-        return roleHierarchy;
+        return RoleEnum.getRoleHierarchy();
     }
 
     private SecurityExpressionHandler<FilterInvocation> webExpressionHandler() {

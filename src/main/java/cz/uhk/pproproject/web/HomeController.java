@@ -1,7 +1,10 @@
 package cz.uhk.pproproject.web;
 
+import cz.uhk.pproproject.model.RoleEnum;
+import cz.uhk.pproproject.model.User;
 import cz.uhk.pproproject.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,13 +14,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class HomeController {
     @Autowired
     private UserRepository userRepo;
+
     @GetMapping("/")
     public String home(Model m){
         return "landingPage";
-    }
-
-    @GetMapping("/403")
-    public String accessDenied(Model m){
-        return "errors/403";
     }
 }

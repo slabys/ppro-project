@@ -3,26 +3,16 @@ package cz.uhk.pproproject.model;
 import javax.persistence.*;
 
 @Entity
+
 public class User extends BaseModel{
-    public User(String email, String username, String firstName, String lastName, RoleEnum role) {
+    public User(String email, String firstName, String lastName, RoleEnum role) {
         this.email = email;
-        this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.role = role;
     }
 
-    public User() {
-
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
+    public User() {}
 
     public String getEmail() {
         return email;
@@ -34,8 +24,6 @@ public class User extends BaseModel{
 
     @Column(nullable = false, unique = true, length = 45)
     private String email;
-    @Column
-    private String username;
     @Column(nullable = false, length = 20)
     private String firstName;
     @Column(nullable = false, length = 20)

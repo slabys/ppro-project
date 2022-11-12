@@ -1,97 +1,145 @@
 package cz.uhk.pproproject.web;
 
 import cz.uhk.pproproject.middleware.CustomUserDetails;
+import cz.uhk.pproproject.model.Email;
 import cz.uhk.pproproject.model.RoleEnum;
 import cz.uhk.pproproject.model.User;
 import cz.uhk.pproproject.model.UserActivationToken;
+import cz.uhk.pproproject.repository.EmailRepository;
 import cz.uhk.pproproject.repository.UserActivationTokenRepository;
 import cz.uhk.pproproject.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
+@PropertySource("classpath:application.properties")
 @Controller
 public class UserController {
     @Autowired
     private UserRepository userRepo;
     @Autowired
     private UserActivationTokenRepository uatRepo;
+    @Autowired
+    private EmailRepository emailRepo;
+
+    @Value("${userAccounts.daysForExpire}")
+    private int expirationDays;
 
     // User activation
     @GetMapping("/activateUser/{token}")
-    public String activateUser(@PathVariable String token){
+    public String activateUser(Model m, @PathVariable String token, RedirectAttributes redirectAttrs) throws IOException {
+        UserActivationToken uat = uatRepo.findByToken(token);
+        if(uat != null){
+            if(uat.getExpireDate().before(new Date())){
+                redirectAttrs.addFlashAttribute("error", "Activation token doesn't exist!");
+                return "redirect: /activateAccount";
+            }
+            Optional<User> user = userRepo.findById(uat.getUser().getId());
+            if(user.isPresent()){
+                m.addAttribute("user",user);
+                m.addAttribute("uat",uat);
+                return "activateAccount";
+            }
+        }else{
+            redirectAttrs.addFlashAttribute("error", "Activation token doesn't exist!");
+            return "redirect:/" ;
+        }
         //TODO: check if UserActivationToken exists, check if user is not active, user registration form - set password all additional info -> post to /activateUser
-        return "activateUserForm";
+        return null;
     }
 
     @PostMapping("/activateUser")
-    public void activateUserPost(Model m, @ModelAttribute User userToActivate, HttpServletResponse resp) throws IOException {
+    @Transactional
+    public String activateUserPost(Model m, User user,RedirectAttributes redirectAttrs) throws IOException {
 
         //TODO: add validation of data, update user in db (activate), add hashed password
-        resp.sendRedirect("/mainPage");
-    }
+        User updateUser = (User) userRepo.findByEmail(user.getEmail());
+        updateUser.setActive(true);
+        UserActivationToken uat = uatRepo.findActiveByUser(updateUser);
+        uat.setTokenUsed(true);
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        updateUser.setPassword(encodedPassword);
 
-    @GetMapping("/registerUser")
-    public String showRegistrationForm(Model model) {
-        model.addAttribute("user", new User());
+        //TODO email edit link
+        Email tokenEmail = new Email("New account on Employerr platform was successfully activated!", "no-reply@employerr.com", "Your account was successfully activated. Please revise your data. If there is something incorrect contact owner of company to update your data.", user);
+        emailRepo.save(tokenEmail);
+        //TODO: send email about successful activation
 
-        return "signup";
+        userRepo.save(updateUser);
+        uatRepo.save(uat);
+        redirectAttrs.addFlashAttribute("info","Activation was successful");
+        return "redirect:/";
     }
 
     @PreAuthorize("hasRole('ROLE_OWNER')")
+    @GetMapping("/registerUser")
+    public String showRegistrationForm(Model model, Authentication auth) {
+        model.addAttribute("user", new User());
+
+        RoleHierarchyImpl roleHierarchy = RoleEnum.getRoleHierarchy();
+            CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+
+            Collection<? extends GrantedAuthority> roles = Collections.singletonList(new SimpleGrantedAuthority(("ROLE_"+userDetails.getUser().getRole().toString())));
+            Collection<GrantedAuthority> ga = roleHierarchy.getReachableGrantedAuthorities(roles);
+            model.addAttribute("reachableRoles", ga);
+
+        return "signupEmployee";
+    }
+
     @Transactional
     @PostMapping("/registerUser")
-    public void processRegister(Model m, User user, Environment env, HttpServletResponse resp) throws IOException {
-        //TODO set this for our auth
-        //BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        //String encodedPassword = passwordEncoder.encode(user.getPassword());
-        //user.setPassword(encodedPassword);
-
+    public String processRegister(Model m, User user, RedirectAttributes redirectAttrs) throws IOException {
 
         User userSearch = userRepo.findByEmail(user.getEmail());
-        if(userSearch == null){
-            user.setRole(RoleEnum.EMPLOYEE);
-            user.setActive(false);
-            userRepo.save(user);
-        }else{
-            if(userSearch.isActive()){
-                m.addAttribute("errors", "User is already active!");
-                resp.sendRedirect("registerUser");
-            }
-            UserActivationToken activeToken = uatRepo.findActiveByUser(user);
+        if(userSearch != null && userSearch.isActive()){
+            redirectAttrs.addFlashAttribute("error", "User is already active!");
+            return "redirect:/registerUser";
+        }else {
+            UserActivationToken activeToken = uatRepo.findActiveByUserEmail(user.getEmail());
             Date today = new Date();
             Calendar c = Calendar.getInstance();
-            c.add(Calendar.DATE, Integer.parseInt(env.getProperty("userAccounts.daysForExpire")));  // number of days to add
-            if(activeToken == null){
-                UserActivationToken uat = new UserActivationToken(user, UUID.randomUUID().toString(),c.getTime());
+            c.add(Calendar.DATE, expirationDays);  // number of days to add
+            if (activeToken == null) {
+                user.setRole(RoleEnum.EMPLOYEE);
+                user.setActive(false);
+                userRepo.save(user);
+                UserActivationToken uat = new UserActivationToken(user, UUID.randomUUID().toString(), c.getTime());
                 uatRepo.save(uat);
-                //TODO SEND EMAIL
-                resp.sendRedirect("/registerSuccessfull");
-            }else{
-                if(activeToken.getExpireDate().after(new Date())){
+
+                //TODO email edit link
+                Email tokenEmail = new Email("New account activation on Employerr platform", "no-reply@employerr.com", "Activate your account at this link: http://localhost:8080/activateUser/" + uat.getToken(), user);
+                emailRepo.save(tokenEmail);
+                //TODO implement mail sending on deployment env.
+
+                redirectAttrs.addFlashAttribute("info","Account created successfully");
+                return "redirect:/";
+            } else {
+                if (activeToken.getExpireDate().before(new Date())) {
                     activeToken.setExpireDate(c.getTime());
                     uatRepo.save(activeToken);
-                    m.addAttribute("errors", "Token expire date is updated!");
-                    resp.sendRedirect("/registerSuccessfull");
-                }else{
-                    m.addAttribute("errors", "Token exists and is not expired!");
-                    resp.sendRedirect("registerUser");
+                    redirectAttrs.addFlashAttribute("info","Token expiration date extended to 30 days.");
+                    return "redirect:/";
+                } else {
+                    redirectAttrs.addFlashAttribute("error", "Token exists and is not expired!");
+                    return "redirect:/registerUser";
                 }
             }
         }
@@ -115,7 +163,12 @@ public class UserController {
     }
 
     @GetMapping("/login")
-    public String login(){
+    public String login(Authentication auth,RedirectAttributes redirectAttrs){
+        if(auth != null){
+            redirectAttrs.addFlashAttribute("error", "User is already logged in!");
+            return "redirect:/";
+        }else{
         return "login";
+        }
     }
 }

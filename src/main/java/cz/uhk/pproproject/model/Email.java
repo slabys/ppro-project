@@ -10,11 +10,10 @@ public class Email extends BaseModel {
     private String replyTo;
     @Column(nullable = false)
     private String content;
-    @Column(nullable = false)
-    @ManyToOne(targetEntity = User.class)
-    private String sendTo;
+    @OneToOne(targetEntity = User.class)
+    private User sendTo;
 
-    public Email(String subject, String replyTo, String content, String sendTo) {
+    public Email(String subject, String replyTo, String content, User sendTo) {
         this.subject = subject;
         this.replyTo = replyTo;
         this.content = content;
@@ -48,11 +47,11 @@ public class Email extends BaseModel {
         this.content = content;
     }
 
-    public String getSendTo() {
+    public User getSendTo() {
         return sendTo;
     }
 
-    public void setSendTo(String sendTo) {
+    public void setSendTo(User sendTo) {
         this.sendTo = sendTo;
     }
 }

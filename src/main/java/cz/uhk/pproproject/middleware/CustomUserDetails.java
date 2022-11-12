@@ -1,5 +1,6 @@
 package cz.uhk.pproproject.middleware;
 
+import cz.uhk.pproproject.model.RoleEnum;
 import cz.uhk.pproproject.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -54,12 +55,14 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return user.isActive();
     }
 
     public User getUser(){
         return user;
     }
+
+    public RoleEnum getRole() { return user.getRole(); }
 
     public String getFullName() {
         return user.getFirstName() + " " + user.getLastName();

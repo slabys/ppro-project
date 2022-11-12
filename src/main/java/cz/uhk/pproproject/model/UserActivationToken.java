@@ -9,9 +9,9 @@ public class UserActivationToken extends BaseModel{
         return user;
     }
 
-    @OneToOne
-    @JoinColumn()
+    @OneToOne(targetEntity = User.class)
     private User user;
+
     @Column(nullable = false)
     private String token;
 
