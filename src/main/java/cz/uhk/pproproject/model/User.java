@@ -1,5 +1,6 @@
 package cz.uhk.pproproject.model;
 
+import javax.management.relation.Role;
 import javax.persistence.*;
 
 @Entity
@@ -11,6 +12,10 @@ public class User extends BaseModel{
         this.lastName = lastName;
         this.role = role;
     }
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RoleEnum role;
 
     public User() {}
 
@@ -81,13 +86,18 @@ public class User extends BaseModel{
         return role;
     }
 
+    public String getRoleWithPrefix(){
+        return RoleEnum.getRoleWithPrefix(this.role);
+    }
+    public void setRole(String role){
+        if(role.contains("ROLE_")) role.replace("ROLE_","");
+        this.role = RoleEnum.valueOf(role);
+    }
+
     public void setRole(RoleEnum role) {
         this.role = role;
     }
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private RoleEnum role;
 
 /*
     public Set<Project> getAssignedProjects() {
