@@ -89,9 +89,8 @@ public class UserController {
 
         Email successEmail = new Email("New account on Employerr platform was successfully activated!", "no-reply@employerr.com", "Your account was successfully activated. Please revise your data. If there is something incorrect contact owner of company to update your data.", updateUser);
         emailRepo.save(successEmail);
-        if(Objects.equals(env, "prod")) {
-            emailService.sendSimpleMail(new EmailDetails(successEmail.getSendTo().getEmail(), successEmail.getContent(), successEmail.getSubject(), null));
-        }
+        emailService.sendSimpleMail(new EmailDetails(successEmail.getSendTo().getEmail(), successEmail.getContent(), successEmail.getSubject(), null));
+
 
         redirectAttrs.addFlashAttribute("info","Activation was successful");
         return "redirect:/";
@@ -137,9 +136,8 @@ public class UserController {
                 //Email notification
                 Email tokenEmail = new Email("New account activation on Employerr platform", "no-reply@employerr.com", "Activate your account at this link: " + domain + "activateUser/" + uat.getToken(), user);
                 emailRepo.save(tokenEmail);
-                if(Objects.equals(env, "prod")) {
-                    emailService.sendSimpleMail(new EmailDetails(tokenEmail.getSendTo().getEmail(),tokenEmail.getContent(),tokenEmail.getSubject(),null));
-                }
+                emailService.sendSimpleMail(new EmailDetails(tokenEmail.getSendTo().getEmail(),tokenEmail.getContent(),tokenEmail.getSubject(),null));
+
 
                 redirectAttrs.addFlashAttribute("info","Account created successfully");
                 return "redirect:/";
