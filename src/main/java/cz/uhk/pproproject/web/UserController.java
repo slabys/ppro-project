@@ -8,6 +8,8 @@ import cz.uhk.pproproject.model.UserActivationToken;
 import cz.uhk.pproproject.repository.EmailRepository;
 import cz.uhk.pproproject.repository.UserActivationTokenRepository;
 import cz.uhk.pproproject.repository.UserRepository;
+import cz.uhk.pproproject.service.email.EmailDetails;
+import cz.uhk.pproproject.service.email.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -36,8 +38,16 @@ public class UserController {
     @Autowired
     private EmailRepository emailRepo;
 
+    @Autowired
+    public EmailService emailService;
     @Value("${userAccounts.daysForExpire}")
     private int expirationDays;
+
+    @Value("${cz.uhk.pproproject.enviroment}")
+    private String env;
+
+    @Value("${cz.uhk.pproproject.domain}")
+    private String domain;
 
     // User activation
     @GetMapping("/activateUser/{token}")
@@ -58,16 +68,16 @@ public class UserController {
             redirectAttrs.addFlashAttribute("error", "Activation token doesn't exist!");
             return "redirect:/" ;
         }
-        //TODO: check if UserActivationToken exists, check if user is not active, user registration form - set password all additional info -> post to /activateUser
+
         return null;
     }
 
     @PostMapping("/activateUser")
     @Transactional
     public String activateUserPost(Model m, User user,RedirectAttributes redirectAttrs) throws IOException {
-
+        //TODO: user registration form - implement additional info -> post to /activateUser
         //TODO: add validation of data
-        User updateUser = (User) userRepo.findByEmail(user.getEmail());
+        User updateUser = userRepo.findByEmail(user.getEmail());
         updateUser.setActive(true);
         UserActivationToken uat = uatRepo.findActiveByUser(updateUser);
         uat.setTokenUsed(true);
@@ -77,10 +87,11 @@ public class UserController {
         userRepo.save(updateUser);
         uatRepo.save(uat);
 
-        //TODO email edit link
         Email successEmail = new Email("New account on Employerr platform was successfully activated!", "no-reply@employerr.com", "Your account was successfully activated. Please revise your data. If there is something incorrect contact owner of company to update your data.", updateUser);
         emailRepo.save(successEmail);
-        //TODO: send email about successful activation
+        if(Objects.equals(env, "prod")) {
+            emailService.sendSimpleMail(new EmailDetails(successEmail.getSendTo().getEmail(), successEmail.getContent(), successEmail.getSubject(), null));
+        }
 
         redirectAttrs.addFlashAttribute("info","Activation was successful");
         return "redirect:/";
@@ -108,26 +119,27 @@ public class UserController {
     @Transactional
     @PostMapping("/registerUser")
     public String processRegister(Model m, User user, RedirectAttributes redirectAttrs) throws IOException {
-        System.out.println(user.getRole());
         User userSearch = userRepo.findByEmail(user.getEmail());
         if(userSearch != null && userSearch.isActive()){
             redirectAttrs.addFlashAttribute("error", "User is already active!");
             return "redirect:/registerUser";
         }else {
             UserActivationToken activeToken = uatRepo.findActiveByUserEmail(user.getEmail());
-            Date today = new Date();
+
             Calendar c = Calendar.getInstance();
-            c.add(Calendar.DATE, expirationDays);  // number of days to add
+            c.add(Calendar.DATE, expirationDays);  // number of days to add to expiration days
             if (activeToken == null) {
                 user.setActive(false);
                 userRepo.save(user);
                 UserActivationToken uat = new UserActivationToken(user, UUID.randomUUID().toString(), c.getTime());
                 uatRepo.save(uat);
 
-                //TODO email edit link
-                Email tokenEmail = new Email("New account activation on Employerr platform", "no-reply@employerr.com", "Activate your account at this link: http://localhost:8080/activateUser/" + uat.getToken(), user);
+                //Email notification
+                Email tokenEmail = new Email("New account activation on Employerr platform", "no-reply@employerr.com", "Activate your account at this link: " + domain + "activateUser/" + uat.getToken(), user);
                 emailRepo.save(tokenEmail);
-                //TODO implement mail sending on deployment env.
+                if(Objects.equals(env, "prod")) {
+                    emailService.sendSimpleMail(new EmailDetails(tokenEmail.getSendTo().getEmail(),tokenEmail.getContent(),tokenEmail.getSubject(),null));
+                }
 
                 redirectAttrs.addFlashAttribute("info","Account created successfully");
                 return "redirect:/";
