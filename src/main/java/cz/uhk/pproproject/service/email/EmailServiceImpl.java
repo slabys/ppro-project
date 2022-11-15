@@ -22,7 +22,7 @@ public class EmailServiceImpl implements EmailService {
     @Value("${spring.mail.from}")
     private String sender;
 
-    @Value("${spring.mail.to}")
+    @Value("${spring.mail.toTrap}")
     private String reciever;
 
     @Value("${cz.uhk.pproproject.emailSendToTrap}")
