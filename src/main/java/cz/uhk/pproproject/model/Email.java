@@ -1,16 +1,21 @@
 package cz.uhk.pproproject.model;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 
 @Entity
+@NoArgsConstructor
 public class Email extends BaseModel {
-    @Column(nullable = false)
+    @Column(nullable = false) @Setter @Getter
     private String subject;
-    @Column
+    @Column @Setter @Getter
     private String replyTo;
-    @Column(nullable = false)
+    @Column(nullable = false) @Setter @Getter
     private String content;
-    @OneToOne(targetEntity = User.class)
+    @OneToOne(targetEntity = User.class) @Setter @Getter
     private User sendTo;
 
     public Email(String subject, String replyTo, String content, User sendTo) {
@@ -20,38 +25,5 @@ public class Email extends BaseModel {
         this.sendTo = sendTo;
     }
 
-    public Email() {
-    }
 
-    public String getSubject() {
-        return subject;
-    }
-
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
-
-    public String getReplyTo() {
-        return replyTo;
-    }
-
-    public void setReplyTo(String replyTo) {
-        this.replyTo = replyTo;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public User getSendTo() {
-        return sendTo;
-    }
-
-    public void setSendTo(User sendTo) {
-        this.sendTo = sendTo;
-    }
 }
