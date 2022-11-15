@@ -53,9 +53,7 @@ public class WebSecurityConfig {
                         .deleteCookies("JSESSIONID"))
                 .csrf()
                 .and()
-                .rememberMe().tokenValiditySeconds(1209600)
-                .and()
-                .exceptionHandling().accessDeniedPage("/403");
+                .rememberMe().tokenValiditySeconds(1209600);
 
         return http.build();
     }
