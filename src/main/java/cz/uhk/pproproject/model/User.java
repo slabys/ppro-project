@@ -1,10 +1,18 @@
 package cz.uhk.pproproject.model;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Required;
+
 import javax.management.relation.Role;
 import javax.persistence.*;
+import java.util.List;
+import java.util.Set;
 
 @Entity
-
+@NoArgsConstructor
 public class User extends BaseModel{
     public User(String email, String firstName, String lastName, RoleEnum role) {
         this.email = email;
@@ -15,76 +23,23 @@ public class User extends BaseModel{
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
+    @Getter
     private RoleEnum role;
-
-    public User() {}
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    @Column(nullable = false, unique = true, length = 45)
+    @Column(nullable = false, unique = true, length = 45) @Setter @Getter
     private String email;
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, length = 20) @Setter @Getter
     private String firstName;
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, length = 20) @Setter @Getter
     private String lastName;
-    @Column
+
+    @Column @Setter @Getter
     private String password;
-    @Column
+
+    @Column @Setter @Getter
     private float salary;
 
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    @Column
+    @Column @Setter @Getter
     private boolean active;
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public float getSalary() {
-        return salary;
-    }
-
-    public void setSalary(float salary) {
-        this.salary = salary;
-    }
-
-    public RoleEnum getRole() {
-        return role;
-    }
 
     public String getRoleWithPrefix(){
         return RoleEnum.getRoleWithPrefix(this.role);
@@ -99,18 +54,19 @@ public class User extends BaseModel{
     }
 
 
-/*
-    public Set<Project> getAssignedProjects() {
-        return assignedProjects;
-    }
+    @Getter
+    @Setter
+    @ManyToMany(targetEntity = Project.class, cascade = { CascadeType.ALL })
+    @JoinTable(name = "user_project",
+            joinColumns = { @JoinColumn(name = "user_id") },
+            inverseJoinColumns = { @JoinColumn(name = "project_id") })
+    private List<Project> projects;
 
-    public void setAssignedProjects(Set<Project> assignedProjects) {
-        this.assignedProjects = assignedProjects;
+    public boolean hasAccessToProject(Project project){
+        return projects.contains(project);
     }
-
-    @Column
-    @ManyToMany()
-    private Set<Project> assignedProjects;
-*/
+    public void addProject(Project project){
+        this.projects.add(project);
+    }
 }
 
