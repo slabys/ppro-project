@@ -22,6 +22,12 @@ public class EmailServiceImpl implements EmailService {
     @Value("${spring.mail.from}")
     private String sender;
 
+    @Value("${spring.mail.to}")
+    private String reciever;
+
+    @Value("${cz.uhk.pproproject.emailSendToTrap}")
+    private boolean mailMethod;
+
     public boolean sendSimpleMail(EmailDetails details)
     {
         try {
@@ -29,7 +35,11 @@ public class EmailServiceImpl implements EmailService {
                     = new SimpleMailMessage();
 
             mailMessage.setFrom(sender);
-            mailMessage.setTo(details.getRecipient());
+            if(mailMethod){
+                mailMessage.setTo(reciever);
+            }else{
+                mailMessage.setTo(details.getRecipient());
+            }
             mailMessage.setText(details.getMsgBody());
             mailMessage.setSubject(details.getSubject());
 
