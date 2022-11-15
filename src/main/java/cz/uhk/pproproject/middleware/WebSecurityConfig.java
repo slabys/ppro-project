@@ -49,7 +49,7 @@ public class WebSecurityConfig {
                         .defaultSuccessUrl("/",true)
                         .permitAll()
                 )
-                .logout((logout) -> logout.permitAll().logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET")).logoutSuccessUrl("/").invalidateHttpSession(true)
+                .logout((logout) -> logout.permitAll().logoutSuccessUrl("/").invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID"))
                 .csrf()
                 .and()

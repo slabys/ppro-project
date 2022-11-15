@@ -23,7 +23,7 @@ public class DatabaseSeeder {
     }
 
     private void seedUsersTable() {
-        User databaseSeededUser = userRepo.findByEmail("admin@employeer.com");
+        User databaseSeededUser = userRepo.findByEmail("admin@employerr.com");
         if(databaseSeededUser == null) {
             User admin = new User("admin@employerr.com","Arnoštek","Šimravý", RoleEnum.ADMIN);
             BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
