@@ -11,6 +11,7 @@
 
         <div class="alert alert-primary" role="alert" th:text="${info}" th:if="${info}"></div>
         <div class="alert alert-danger" role="alert" th:text="${error}" th:if="${error}"></div>
+
         <div class="container-lg d-flex flex-column" style="max-width: 38rem;">
             <form th:action="@{/registerUser}" th:object="${user}"
                   method="post">

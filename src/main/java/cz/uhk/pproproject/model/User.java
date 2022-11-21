@@ -44,6 +44,9 @@ public class User extends BaseModel{
     public String getRoleWithPrefix(){
         return RoleEnum.getRoleWithPrefix(this.role);
     }
+    public String appendCompanyEmail(String email){
+        return email + "@employerr.com";
+    }
     public void setRole(String role){
         if(role.contains("ROLE_")) role.replace("ROLE_","");
         this.role = RoleEnum.valueOf(role);
