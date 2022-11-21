@@ -1,0 +1,36 @@
+@import url('./colors.css');
+
+nav a {
+    color: black;
+    text-decoration: none;
+}
+nav a:hover {
+    color: var(--bs-red);
+    text-decoration: underline;
+}
+nav input, nav form {
+    border: none;
+    background: transparent;
+    display: inline-flex;
+}
+nav form {
+    background: var(--bs-gray-300);
+    border-left: 0.125rem solid;
+    border-color: var(--bs-red);
+    padding: 0.25rem 0.5rem;
+}
+nav form:hover {
+    color: var(--bs-red);
+    text-decoration: underline;
+    transition: all 300ms;
+}
+a {
+    color: var(--bs-red);
+    text-decoration: none;
+    transition: color 300ms;
+}
+a:hover {
+    color: var(--bs-pink);
+    text-decoration: underline;
+    transition: color 300ms;
+}

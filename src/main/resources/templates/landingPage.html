@@ -1,29 +1,46 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/layout}">
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/layout}">
 <head>
     <meta charset="UTF-8">
     <title>PPRO Project</title>
 </head>
 <body>
-<section layout:fragment="content" class="container text-center">
-    <h1>Welcome to Employerr</h1>
-    <div sec:authorize="isAuthenticated()"><h2>Logged user: </h2> <span sec:authentication="principal.fullName">User fullname</span> (<span sec:authentication="principal.role">role</span>)</div>
-    <div class="alert alert-primary" role="alert" th:text="${info}" th:if="${info}"></div>
-    <div class="alert alert-danger" role="alert" th:text="${error}" th:if="${error}"></div>
-    <h3><a th:href="@{/users}">List of Users</a></h3>
-
-    <div sec:authorize="isAuthenticated()">
-    <h3><a th:href="@{/registerUser}">Register</a></h3>
+<section layout:fragment="content" class="container py-4">
+    <div sec:authorize="!isAuthenticated()" class="d-flex flex-column justify-content-center align-items-center h-100">
+        <h1 class="f-flex"><span class="d-flex align-self-start h2" style="color: var(--bs-red)">
+            Hello!</span> Welcome to <u>Employerr</u>!
+        </h1>
+        <div class="d-flex flex-column">
+            <a th:href="@{/login}">
+                <button class="w-100 mt-4 p-3 border-0"
+                        style="font-size: 1.5rem; line-height: 1.75rem; font-weight: bold">
+                    Log In
+                </button>
+            </a>
+            <p class=" text-center mt-2
+            ">Don't have account yet? <a href="mailto:admin@employerr.com">Contact admin.</a></p>
+        </div>
     </div>
 
-    <div sec:authorize="isAuthenticated()">
-        <form th:action="@{/logout}" method="post">
-            <input type="submit" value="Log out"/>
-        </form>
+    <div class="d-flex flex-column flex-md-row-reverse gap-4" sec:authorize="isAuthenticated()">
+        <div class="card p-4">
+            <h2><i class="bi-person-circle pe-4"></i>Logged User:</h2>
+            <div class="d-flex flex-column justify-content-end">
+                <label><b>E-mail:</b></label>
+                <p sec:authentication="principal.username">User fullname</p>
+                <label><b>Role:</b></label>
+                <p sec:authentication="principal.role">role</p>
+            </div>
+        </div>
+        <div style="flex: 1">
+            <h2>Welcome to <u>Employerr!</u></h2>
+            <p>Here are links you may find useful:</p>
+            <h3><a th:href="@{/users}"><i class="bi-table pe-2"></i>List of Users</a></h3>
+            <h3><a th:href="@{/registerUser}"><i class="bi-person-plus pe-2"></i>Register new User</a></h3>
+        </div>
     </div>
-    <div sec:authorize="isAnonymous()">
-        <h3><a th:href="@{/login}">Log in</a></h3>
-    </div>
+
 </section>
 </body>
 </html>
