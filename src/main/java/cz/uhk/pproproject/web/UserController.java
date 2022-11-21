@@ -129,6 +129,9 @@ public class UserController {
             c.add(Calendar.DATE, expirationDays);  // number of days to add to expiration days
             if (activeToken == null) {
                 user.setActive(false);
+                user.setEmail(user.getEmail()+"@employerr.com");
+                user.setFirstName(user.getFirstName().substring(0,1).toUpperCase() + user.getFirstName().substring(1));
+                user.setLastName(user.getLastName().substring(0,1).toUpperCase() + user.getLastName().substring(1));
                 userRepo.save(user);
                 UserActivationToken uat = new UserActivationToken(user, UUID.randomUUID().toString(), c.getTime());
                 uatRepo.save(uat);
