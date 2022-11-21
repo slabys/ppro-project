@@ -7,19 +7,19 @@
 </head>
 <body>
 <section layout:fragment="content">
-    <form th:action="@{/login}" method="post" >
+    <form th:action="@{/login}" method="post">
         <div class="container-lg d-flex flex-column mt-5" style="width: 18rem;">
             <div class="d-flex flex-column justify-content-center">
                 <div class="f-flex justify-content-center text-center">
                     <img src="/images/logo.svg" width="92" style="object-fit: cover"/>
                 </div>
                 <label for="email">Email address</label>
-                <input type="email" name="email" id="email" class="form-control" placeholder="Email address" required=""
+                <input type="email" name="email" id="email" class="form-control" placeholder="Email address" required
                        autofocus=""/>
                 <br/>
                 <label for="password">Password</label>
-                <input type="password" name="password" id="password" class="form-control" placeholder="Password" required=""
-                       autofocus=""/>
+                <input type="password" name="password" id="password" class="form-control" placeholder="Password"
+                       required autofocus=""/>
                 <br/>
                 <input type="submit" value="Sign In"/>
                 <div class="text-danger" th:if="${param.error}">
