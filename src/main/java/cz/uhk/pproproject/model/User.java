@@ -59,7 +59,7 @@ public class User extends BaseModel{
 
     @Getter
     @Setter
-    @ManyToMany(targetEntity = Project.class, cascade = { CascadeType.ALL })
+    @ManyToMany(targetEntity = Project.class, cascade = { CascadeType.ALL },fetch = FetchType.EAGER)
     @JoinTable(name = "user_project",
             joinColumns = { @JoinColumn(name = "user_id") },
             inverseJoinColumns = { @JoinColumn(name = "project_id") })

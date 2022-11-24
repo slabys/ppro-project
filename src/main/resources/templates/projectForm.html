@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>PPRO Project</title>
+</head>
+<body>
+<section layout:fragment="content" class="container py-4">
+
+    <div class="d-flex flex-column gap-4">
+        <div class="card p-4">
+            <h2><i class="bi bi-card-text pe-4"></i>Project form:</h2>
+            <div class="d-flex flex-column justify-content-end">
+                <form th:action="@{/addProject}">
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+</section>
+</body>
+</html>
