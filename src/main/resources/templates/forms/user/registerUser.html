@@ -2,7 +2,7 @@
 <html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/layout}">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Employerr - Register user</title>
 </head>
 <body>
 <section layout:fragment="content" class="container text-center">
@@ -13,7 +13,7 @@
         <div class="alert alert-danger" role="alert" th:text="${error}" th:if="${error}"></div>
 
         <div class="container-lg d-flex flex-column" style="max-width: 38rem;">
-            <form th:action="@{/registerUser}" th:object="${user}"
+            <form th:action="@{/dashboard/registerUser}" th:object="${user}"
                   method="post">
                 <div class="form-group row py-4">
                     <label class="col-form-label col-sm-12 col-md-2 text-start">E-mail: </label>

@@ -15,13 +15,13 @@ public class Project extends BaseModel{
     @Column @Getter @Setter
     private String name;
 
-    @Column @Getter @Setter
+    @Column(nullable = true) @Getter @Setter
     private String url;
 
-    @Column @Getter @Setter
-    private String additionalInfo;
+    @Column(nullable = true) @Getter @Setter
+    private String projectInfo;
 
-    @Column @Getter @Setter
+    @Column(nullable = false) @Getter @Setter
     private String description;
 
     @Getter @Setter @OneToOne(targetEntity = User.class)

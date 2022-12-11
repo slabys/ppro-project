@@ -46,9 +46,11 @@
         </nav>
     </header>
 
-    <section layout:fragment="content" style="flex: 1">
+    <section>
         <div class="alert alert-primary" role="alert" th:text="${info}" th:if="${info}">Info</div>
         <div class="alert alert-danger" role="alert" th:text="${error}" th:if="${error}">Error</div>
+    </section>
+    <section class="m-3" layout:fragment="content" style="flex: 1">
         <p>Page content goes here</p>
     </section>
 

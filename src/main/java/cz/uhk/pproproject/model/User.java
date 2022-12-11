@@ -71,5 +71,9 @@ public class User extends BaseModel{
     public void addProject(Project project){
         this.projects.add(project);
     }
+
+    public String getFullName(){
+        return firstName + " " + lastName;
+    }
 }
 
