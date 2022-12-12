@@ -24,7 +24,6 @@ public class HomeController {
             List<Project> userProjects = userDetails.getUser().getProjects();
 
             m.addAttribute("accessibleProjects", userProjects);
-            System.out.println(userProjects);
         }
         return "landingPage";
     }

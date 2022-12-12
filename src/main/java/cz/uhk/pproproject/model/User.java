@@ -63,8 +63,8 @@ public class User extends BaseModel{
     @JoinTable(name = "user_project",
             joinColumns = { @JoinColumn(name = "user_id") },
             inverseJoinColumns = { @JoinColumn(name = "project_id") })
-    private List<Project> projects;
 
+    private List<Project> projects;
     public boolean hasAccessToProject(Project project){
         return projects.contains(project);
     }

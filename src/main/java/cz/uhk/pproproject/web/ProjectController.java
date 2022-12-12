@@ -14,9 +14,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.*;
+
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Controller
 public class ProjectController {
@@ -53,7 +56,7 @@ public class ProjectController {
         Optional<Project> project = projectRepository.findById(id);
         if(project.isEmpty()){
             redirectAttrs.addFlashAttribute("error", "Project does not exist");
-            return "redirect:/";
+            throw new ResponseStatusException(NOT_FOUND, "Unable to find project");
         }
         List<User> users = userRepository.findAllHigherRoles();
         users.sort(Comparator.comparing(User::getRole));
@@ -71,6 +74,10 @@ public class ProjectController {
             projectToEdit.get().setProjectOwner(project.getProjectOwner());
             projectRepository.save(projectToEdit.get());
 
+            User user = project.getProjectOwner();
+            if(!user.getProjects().contains(projectToEdit.get())) user.addProject(projectToEdit.get());
+            userRepository.save(user);
+
             redirectAttrs.addFlashAttribute("info", "Project ownership assigned to " + project.getProjectOwner().getFullName() + " successfully");
         }else{
             redirectAttrs.addFlashAttribute("error", "Project ownership assign was not successful, because project does not exists");
@@ -83,12 +90,12 @@ public class ProjectController {
         Optional<Project> project = projectRepository.findById(id);
         if(project.isEmpty()){
             redirectAttrs.addFlashAttribute("error", "Project does not exists");
-            return "redirect:/";
+            throw new ResponseStatusException(NOT_FOUND, "Project does not exists");
         }
 
         CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
         User user = ((CustomUserDetails) auth.getPrincipal()).getUser();
-        if(project.get().getProjectOwner() != user && user.getRole() != RoleEnum.ADMIN && user.getRole() != RoleEnum.OWNER){
+        if(!project.get().canUserEditProject(user)){
             redirectAttrs.addFlashAttribute("error", "You don't have permissions to change this project");
             return "redirect:/";
         }
@@ -107,9 +114,18 @@ public class ProjectController {
 
     @GetMapping("/dashboard/project/list")
     @PreAuthorize("hasRole('ROLE_OWNER')")
-    public String showProjectForm(Model m){
+    public String showProjectList(Model m){
         List<Project> projects = projectRepository.findAll();
         m.addAttribute("projects", projects);
+        return "project/projectList";
+    }
+    @GetMapping("/dashboard/project/list/user")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    public String showAccessibleProjectList(Model m,Authentication auth){
+        CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+        User user = userDetails.getUser();
+
+        m.addAttribute("projects", user.getProjects());
         return "project/projectList";
     }
 
@@ -118,12 +134,12 @@ public class ProjectController {
         Optional<Project> project = projectRepository.findById(id);
         if(project.isEmpty()){
             redirectAttrs.addFlashAttribute("error", "Project detail does not exists");
-            return "redirect:/";
+            throw new ResponseStatusException(NOT_FOUND, "Project detail does not exists");
         }
         CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
         User user = userDetails.getUser();
 
-        if(project.get().getProjectOwner() != user && user.getRole() != RoleEnum.ADMIN && user.getRole() != RoleEnum.OWNER && !user.getProjects().contains(project.get())){
+        if(!project.get().canUserEditProject(user) && !user.hasAccessToProject(project.get())){
             redirectAttrs.addFlashAttribute("error", "You don't have permissions to view this project details");
             return "redirect:/";
         }
@@ -131,5 +147,4 @@ public class ProjectController {
         m.addAttribute("project", project.get());
         return "project/projectDetail";
     }
-
 }

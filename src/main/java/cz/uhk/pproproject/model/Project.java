@@ -30,4 +30,7 @@ public class Project extends BaseModel{
     @ManyToMany(mappedBy = "projects") @Getter @Setter
     private Set<User> usersOnProject = new HashSet<User>();
 
+    public boolean canUserEditProject(User user){
+        return (this.projectOwner.getId().equals(user.getId()) || user.getRole() == RoleEnum.ADMIN || user.getRole() == RoleEnum.OWNER);
+    }
 }
