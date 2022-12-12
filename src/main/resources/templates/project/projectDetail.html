@@ -28,7 +28,7 @@
         <hr>
         <div class="row">
             <div class="col-md-6">
-                <p><b>Assigned owner:</b> <span th:text="${project.projectOwner.getFullName()} + ' - '+ ${project.projectOwner.role}"></span></p>
+                <p><b>Assigned owner:</b> <span th:text="${project.projectOwner?.getFullName()?:'No one assigned'}">No one assigned </span> <span th:text="'(' + ${#strings.capitalize(#strings.toLowerCase(project.projectOwner?.role))?:'No role'} + ')'"></span></p>
                 <p><b>Description:</b> <span th:text="${project.description}"></span></p>
             </div>
             <div class="col-md-6">

@@ -28,10 +28,12 @@
         <div class="card p-4">
             <h2><i class="bi-person-circle pe-4"></i>Logged User:</h2>
             <div class="d-flex flex-column justify-content-end">
+                <label><b>Name:</b></label>
+                <p th:text="${#authentication.getPrincipal().getUser().getFullName()}">Name</p>
                 <label><b>E-mail:</b></label>
                 <p sec:authentication="principal.username">User fullname</p>
                 <label><b>Role:</b></label>
-                <p sec:authentication="principal.role">role</p>
+                <p th:text="${#strings.capitalize(#strings.toLowerCase(#authentication.getPrincipal().getUser().role))}">role</p>
             </div>
         </div>
         <div style="flex: 1">
