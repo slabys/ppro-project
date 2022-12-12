@@ -20,7 +20,7 @@ public class Task extends BaseModel{
     private String content;
 
     @Getter @Setter
-    @OneToMany(fetch = FetchType.EAGER, targetEntity = Comment.class)
+    @OneToMany(targetEntity = Comment.class)
     @JoinTable(name = "task_comments",
             joinColumns = { @JoinColumn(name = "task_id") },
             inverseJoinColumns = { @JoinColumn(name = "task_comment_id") })

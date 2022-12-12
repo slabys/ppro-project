@@ -10,6 +10,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class DatabaseSeeder {
@@ -17,8 +18,9 @@ public class DatabaseSeeder {
     private UserRepository userRepo;
 
     @GetMapping("/seedDatabase")
-    public String seed() {
+    public String seed(RedirectAttributes redirectAttributes) {
         seedUsersTable();
+        redirectAttributes.addFlashAttribute("info","Admin create script is done!");
         return "redirect:/";
     }
 
@@ -32,7 +34,6 @@ public class DatabaseSeeder {
             admin.setSalary(9000);
             admin.setActive(true);
             userRepo.save(admin);
-            System.out.println("Seeded database with admin account admin@employer.com w pass 123456789");
         } else {
             System.out.println("No need to seed db, proceeding");
         }

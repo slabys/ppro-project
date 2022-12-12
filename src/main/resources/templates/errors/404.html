@@ -2,12 +2,15 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org"xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/layout}">
 
 <head>
-  <title>Ppro 404 page</title>
+  <title>Employerr - Page not found</title>
 </head>
 <body>
-<section layout:fragment="content">
-  <div><h1>Route not found!</h1></div>
-  <img src="https://http.cat/404.jpg">
+<section layout:fragment="content" class="d-flex justify-content-center">
+    <div class="col-bg-6">
+      <div class="m-3 p-3 shadow rounded-5 text-center"><h1>Route not found!</h1>
+        <img width="100%" class="rounded-3" src="https://http.cat/404.jpg">
+      </div>
+    </div>
 </section>
 </body>
 </html>

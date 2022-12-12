@@ -59,9 +59,9 @@ public class UserController {
             }
             Optional<User> user = userRepo.findById(uat.getUser().getId());
             if (user.isPresent()) {
-                m.addAttribute("user", user);
+                m.addAttribute("user", user.get());
                 m.addAttribute("uat", uat);
-                return "activateAccount";
+                return "forms/user/activateAccount";
             }
         } else {
             redirectAttrs.addFlashAttribute("error", "Activation token doesn't exist!");
@@ -97,7 +97,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ROLE_OWNER')")
-    @GetMapping("/registerUser")
+    @GetMapping("/dashboard/registerUser")
     public String showRegistrationForm(Model model, Authentication auth) {
         model.addAttribute("user", new User());
 
@@ -112,11 +112,11 @@ public class UserController {
         }
         model.addAttribute("reachableRoles", reachableRoles);
 
-        return "registerUser";
+        return "forms/user/registerUser";
     }
 
     @Transactional
-    @PostMapping("/registerUser")
+    @PostMapping("/dashboard/registerUser")
     public String processRegister(Model m, User user, RedirectAttributes redirectAttrs) throws IOException {
         User userSearch = userRepo.findByEmail(user.appendCompanyEmail(user.getEmail()));
         if (userSearch != null && user.isActive()) {
@@ -161,7 +161,7 @@ public class UserController {
 
 
     //test of permissions + retrieving logged user data
-    @GetMapping("/users")
+    @GetMapping("/dashboard/users")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
     public String listUsers(Model model, Authentication auth) {
         List<User> listUsers = userRepo.findAll();
@@ -182,7 +182,7 @@ public class UserController {
             redirectAttrs.addFlashAttribute("error", "User is already logged in!");
             return "redirect:/";
         } else {
-            return "login";
+            return "forms/user/login";
         }
     }
 }

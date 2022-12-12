@@ -59,17 +59,21 @@ public class User extends BaseModel{
 
     @Getter
     @Setter
-    @ManyToMany(targetEntity = Project.class, cascade = { CascadeType.ALL })
+    @ManyToMany(targetEntity = Project.class, cascade = { CascadeType.ALL },fetch = FetchType.EAGER)
     @JoinTable(name = "user_project",
             joinColumns = { @JoinColumn(name = "user_id") },
             inverseJoinColumns = { @JoinColumn(name = "project_id") })
-    private List<Project> projects;
 
+    private List<Project> projects;
     public boolean hasAccessToProject(Project project){
         return projects.contains(project);
     }
     public void addProject(Project project){
         this.projects.add(project);
+    }
+
+    public String getFullName(){
+        return firstName + " " + lastName;
     }
 }
 
