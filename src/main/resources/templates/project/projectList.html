@@ -3,13 +3,13 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/layout}">
 <head>
     <meta charset="UTF-8">
-    <title>Employerr - All projects</title>
+    <title>Employerr - Projects</title>
 </head>
 <body>
 <section layout:fragment="content" class="container py-4">
         <div class="p-3" th:if="${!projects.isEmpty()}">
             <div>
-                <h1>List of all projects</h1>
+                <h1>List of projects</h1>
             </div>
             <table class="table table-striped table-bordered">
                 <div class="d-flex py-2 justify-content-end" sec:authorize="hasRole('ROLE_OWNER')">
@@ -29,7 +29,7 @@
                 <tr th:each="project: ${projects}">
                     <td th:text="${project.id}">Project ID</td>
                     <td th:text="${project.name}">Project name</td>
-                    <td th:text="${project.projectOwner.getFullName()} + ' (' + ${project.projectOwner.role} + ')'">Project owner</td>
+                    <td><span th:text="${project.projectOwner?.getFullName()?:'No one assigned'}">No one assigned </span> <span th:text="'(' + ${#strings.capitalize(#strings.toLowerCase(project.projectOwner?.role))?:'No role'} + ')'"></span></td>
                     <td><a th:href="@{'/dashboard/project/detail/'+${project.id}}"><i class="fa-solid fa-magnifying-glass"></i></a></td>
                     <td><a th:href="@{'/dashboard/project/manage/'+${project.id}+'/edit'}"><i class="fa-solid fa-pen-to-square"></i></a></td>
                     <td><a th:href="@{'/dashboard/project/manage/'+${project.id}+'/setOwner'}" sec:authorize="hasRole('ROLE_OWNER')"><i class="fa-solid fa-user-pen"></i></a></td>

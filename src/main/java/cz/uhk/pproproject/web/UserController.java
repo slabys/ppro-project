@@ -106,10 +106,11 @@ public class UserController {
 
         Collection<? extends GrantedAuthority> roles = Collections.singletonList(new SimpleGrantedAuthority((userDetails.getUser().getRoleWithPrefix())));
         Collection<GrantedAuthority> ga = roleHierarchy.getReachableGrantedAuthorities(roles);
-        Collection<RoleEnum> reachableRoles = new ArrayList<RoleEnum>();
+        ArrayList<RoleEnum> reachableRoles = new ArrayList<RoleEnum>();
         for (GrantedAuthority role : ga) {
             reachableRoles.add(RoleEnum.getRoleWithoutPrefix(role.toString()));
         }
+        Collections.sort(reachableRoles);
         model.addAttribute("reachableRoles", reachableRoles);
 
         return "forms/user/registerUser";

@@ -39,7 +39,7 @@ public class ProjectController {
     public String addProject(Project project, RedirectAttributes redirectAttrs, Authentication auth){
         CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
         User user = ((CustomUserDetails) auth.getPrincipal()).getUser();
-        project.setProjectOwner(user);
+        project.setProjectOwner(null);
 
         projectRepository.save(project);
         //save project to owner
