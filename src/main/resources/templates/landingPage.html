@@ -39,10 +39,14 @@
         <div style="flex: 1">
             <h2>Welcome to <u>Employerr!</u></h2>
             <p>Here are links you may find useful:</p>
-            <h3><a th:href="@{/dashboard/users}"><i class="bi-table pe-2"></i>List of Users</a></h3>
-            <h3><a th:href="@{/dashboard/registerUser}"><i class="bi-person-plus pe-2"></i>Register new user</a></h3>
-            <h3><a th:href="@{/dashboard/project/list}"><i class="bi-table pe-2"></i>Projects list</a></h3>
-            <h3><a th:href="@{/dashboard/project/list/user}"><i class="bi-table pe-2"></i>My projects</a></h3>
+            <hr>
+            <h3>Users</h3>
+            <h4><a th:href="@{/dashboard/users}"><i class="bi-table pe-2"></i>List of users</a></h4>
+            <h4><a th:href="@{/dashboard/registerUser}"><i class="bi-person-plus pe-2"></i>Register new user</a></h4>
+            <hr>
+            <h3>Projects</h3>
+            <h4 sec:authorize="hasRole('ROLE_OWNER')"><a th:href="@{/dashboard/project/list}"><i class="bi-kanban pe-2"></i>Projects list (All projects)</a></h4>
+            <h4><a th:href="@{/dashboard/project/list/user}"><i class="bi-journals pe-2"></i>My projects</a></h4>
         </div>
     </div>
 
