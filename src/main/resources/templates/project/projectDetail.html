@@ -28,7 +28,13 @@
         <hr>
         <div class="row">
             <div class="col-md-6">
-                <p><b>Assigned owner:</b> <span th:text="${project.projectOwner?.getFullName()?:'No one assigned'}">No one assigned </span> <span th:text="'(' + ${#strings.capitalize(#strings.toLowerCase(project.projectOwner?.role))?:'No role'} + ')'"></span></p>
+                <p><b>Assigned owner:</b>
+                    <span th:text="${project.projectOwner?.getFullName()?:'No one assigned'}">No one assigned </span>
+                    <span th:text="'(' + ${#strings.capitalize(#strings.toLowerCase(project.projectOwner?.role))?:'No role'} + ')'"></span>
+                    <a target="_blank" th:title="'Show details of '+${project.projectOwner?.getFullName()}" th:href="@{'/dashboard/user/detail/'+${project.projectOwner?.id}}">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </a>
+                </p>
                 <p><b>Description:</b> <span th:text="${project.description}"></span></p>
             </div>
             <div class="col-md-6">
@@ -47,6 +53,34 @@
                 <p><b>Last time edited:</b> <span th:text="${#dates.format(project.lastEditedAt, 'HH:mm:ss dd.MM.yyyy')}"></span></p>
             </div>
         </div>
+        </div>
+        <div class="p-2">
+            <h4>Users assigned to project</h4>
+            <hr>
+            <div class="row">
+                <div class="col-md-12">
+                   <table class="table table-striped table-bordered text-center">
+                       <thead class="thead-dark">
+                       <tr>
+                           <td>First name</td>
+                           <td>Last name</td>
+                           <td>Role name</td>
+                           <td>Email</td>
+                           <td>Show detail</td>
+                       </tr>
+                       </thead>
+                       <tbody>
+                       <tr th:each="user: ${#lists.sort(project.usersOnProject)}">
+                       <td th:text="${user.firstName}"></td>
+                           <td th:text="${user.lastName}"></td>
+                           <td th:text="${#strings.capitalize(#strings.toLowerCase(user.role))}"></td>
+                           <td th:text="${user.email}"></td>
+                           <td><a th:title="'Show details of '+${project.projectOwner?.getFullName()}" target="_blank" th:href="@{'/dashboard/user/detail/'+${user.id}}"><i class="fa-solid fa-magnifying-glass"></i></a></td>
+                       </tr>
+                       </tbody>
+                   </table>
+                </div>
+            </div>
         </div>
     </div>
 </section>

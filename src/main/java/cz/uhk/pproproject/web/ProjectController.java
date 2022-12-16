@@ -2,7 +2,6 @@ package cz.uhk.pproproject.web;
 
 import cz.uhk.pproproject.middleware.CustomUserDetails;
 import cz.uhk.pproproject.model.Project;
-import cz.uhk.pproproject.model.RoleEnum;
 import cz.uhk.pproproject.model.User;
 import cz.uhk.pproproject.repository.ProjectRepository;
 import cz.uhk.pproproject.repository.UserRepository;
@@ -14,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -42,7 +42,7 @@ public class ProjectController {
         project.setProjectOwner(null);
 
         projectRepository.save(project);
-        //save project to owner
+
         user.addProject(project);
         userRepository.save(user);
 
@@ -50,7 +50,7 @@ public class ProjectController {
         return "redirect:/";
     }
 
-    @GetMapping("/dashboard/project/manage/{id}/setOwner")
+    @GetMapping("/dashboard/project/manage/setOwner/{id}")
     @PreAuthorize("hasRole('ROLE_OWNER')")
     public String showProjectOwnerForm(Model m, @PathVariable long id, RedirectAttributes redirectAttrs){
         Optional<Project> project = projectRepository.findById(id);
@@ -71,6 +71,11 @@ public class ProjectController {
     public String setProjectOwner(Project project, RedirectAttributes redirectAttrs, Authentication auth){
         Optional<Project> projectToEdit = projectRepository.findById(project.getId());
         if(projectToEdit.isPresent()){
+            User oldOwner = project.getProjectOwner();
+            if(oldOwner != null){
+                oldOwner.removeFromProject(project);
+                userRepository.save(oldOwner);
+            }
             projectToEdit.get().setProjectOwner(project.getProjectOwner());
             projectRepository.save(projectToEdit.get());
 
@@ -85,20 +90,10 @@ public class ProjectController {
         return "redirect:/";
     }
 
-    @GetMapping("/dashboard/project/manage/{id}/edit")
+    @GetMapping("/dashboard/project/manage/edit/{id}")
     public String editProject(Model m, @PathVariable long id, RedirectAttributes redirectAttrs,Authentication auth){
         Optional<Project> project = projectRepository.findById(id);
-        if(project.isEmpty()){
-            redirectAttrs.addFlashAttribute("error", "Project does not exists");
-            throw new ResponseStatusException(NOT_FOUND, "Project does not exists");
-        }
-
-        CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
-        User user = ((CustomUserDetails) auth.getPrincipal()).getUser();
-        if(!project.get().canUserEditProject(user)){
-            redirectAttrs.addFlashAttribute("error", "You don't have permissions to change this project");
-            return "redirect:/";
-        }
+        if(isProjectInvalidOrUserCannotEditProject(project, auth, redirectAttrs)) return "redirect:/";
 
         m.addAttribute("project", project.get());
 
@@ -108,6 +103,7 @@ public class ProjectController {
     @PostMapping("/dashboard/project/manage/edit")
     public String editProject(Project project, RedirectAttributes redirectAttrs, Authentication auth){
         projectRepository.save(project);
+        if(isProjectInvalidOrUserCannotEditProject(Optional.of(project), auth, redirectAttrs)) return "redirect:/";
         redirectAttrs.addFlashAttribute("info","Edit of project with name " + project.getName() + " was successful");
         return "redirect:/";
     }
@@ -120,7 +116,6 @@ public class ProjectController {
         return "project/projectList";
     }
     @GetMapping("/dashboard/project/list/user")
-    @PreAuthorize("hasRole('ROLE_MANAGER')")
     public String showAccessibleProjectList(Model m,Authentication auth){
         CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
         User user = userDetails.getUser();
@@ -133,18 +128,102 @@ public class ProjectController {
     public String showProjectDetail(Model m,Authentication auth,@PathVariable long id,RedirectAttributes redirectAttrs){
         Optional<Project> project = projectRepository.findById(id);
         if(project.isEmpty()){
-            redirectAttrs.addFlashAttribute("error", "Project detail does not exists");
+            redirectAttrs.addFlashAttribute("error","Project does not exists");
             throw new ResponseStatusException(NOT_FOUND, "Project detail does not exists");
         }
         CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
         User user = userDetails.getUser();
 
-        if(!project.get().canUserEditProject(user) && !user.hasAccessToProject(project.get())){
+        if(!userRepository.findByEmail(user.getEmail()).hasAccessToProject(project.get())){
             redirectAttrs.addFlashAttribute("error", "You don't have permissions to view this project details");
             return "redirect:/";
         }
 
         m.addAttribute("project", project.get());
         return "project/projectDetail";
+    }
+
+    @GetMapping("/dashboard/project/manage/addPeople/{id}")
+    public String showAddPeopleToProjectForm(Model m,Authentication auth,@PathVariable long id,RedirectAttributes redirectAttrs){
+        Optional<Project> project = projectRepository.findById(id);
+        if(isProjectInvalidOrUserCannotEditProject(project, auth, redirectAttrs)) return "redirect:/";
+
+        List<User> employees = userRepository.findAllEmployeesNotInProject(project.get());
+        List<User> managers = userRepository.findAllManagersNotInProject(project.get());
+        List<User> higherRoles = userRepository.findAllHighRolesNotInProject(project.get());
+
+        m.addAttribute("project",project.get());
+        m.addAttribute("employees",employees);
+        m.addAttribute("managers",managers);
+        m.addAttribute("higherRoles",higherRoles);
+        m.addAttribute("addPeople",true);
+        return "forms/project/projectSetPeopleForm";
+    }
+
+    @PostMapping("/dashboard/project/manage/addPeople")
+    public String addPeopleToProject(@RequestParam long id, RedirectAttributes redirectAttrs,@RequestParam List<Long> users,Authentication auth){
+            Optional<Project> project = projectRepository.findById(id);
+        if(isProjectInvalidOrUserCannotEditProject(project, auth, redirectAttrs)) return "redirect:/";
+
+        for (Long userID: users) {
+            Optional<User> optUser = userRepository.findById(userID);
+            User selectedUser = null;
+            if(optUser.isPresent()) {
+                selectedUser = optUser.get();
+                selectedUser.addProject(project.get());
+                userRepository.save(selectedUser);
+            }
+        }
+        redirectAttrs.addFlashAttribute("info","Successfully added users to project called '" +project.get().getName()+"'");
+        return "redirect:/";
+    }
+
+    @GetMapping("/dashboard/project/manage/removePeople/{id}")
+    public String showRemovePeopleFromProjectForm(Model m,Authentication auth,@PathVariable long id,RedirectAttributes redirectAttrs){
+        Optional<Project> project = projectRepository.findById(id);
+        if(isProjectInvalidOrUserCannotEditProject(project, auth, redirectAttrs)) return "redirect:/";
+
+        List<User> employees = userRepository.findAllEmployeesInProject(project.get());
+        List<User> managers = userRepository.findAllManagersInProject(project.get());
+        List<User> higherRoles = userRepository.findAllHighRolesInProject(project.get());
+
+        m.addAttribute("project",project.get());
+        m.addAttribute("employees",employees);
+        m.addAttribute("managers",managers);
+        m.addAttribute("higherRoles",higherRoles);
+        m.addAttribute("addPeople",false);
+        return "forms/project/projectSetPeopleForm";
+    }
+
+    @PostMapping("/dashboard/project/manage/removePeople")
+    public String removePeopleFromProject(@RequestParam long id, RedirectAttributes redirectAttrs,@RequestParam List<Long> users,Authentication auth){
+        Optional<Project> project = projectRepository.findById(id);
+        if(isProjectInvalidOrUserCannotEditProject(project, auth, redirectAttrs)) return "redirect:/";
+        for (Long userID: users) {
+            Optional<User> optUser = userRepository.findById(userID);
+            User selectedUser = null;
+            if(optUser.isPresent()) {
+                selectedUser = optUser.get();
+                selectedUser.removeFromProject(project.get());
+                userRepository.save(selectedUser);
+            }
+        }
+        redirectAttrs.addFlashAttribute("info","Successfully removed users from project called '" +project.get().getName()+"'");
+        return "redirect:/";
+    }
+
+    //checks if project is invalid or if user can't edit project -> returns error/redirect
+    public boolean isProjectInvalidOrUserCannotEditProject(Optional<Project> project, Authentication auth, RedirectAttributes redirectAttrs){
+        if(project.isEmpty()){
+            redirectAttrs.addFlashAttribute("error","Project does not exists");
+            throw new ResponseStatusException(NOT_FOUND, "Project detail does not exists");
+        }
+        CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+        User user = ((CustomUserDetails) auth.getPrincipal()).getUser();
+        if(!project.get().canUserEditProject(user)){
+            redirectAttrs.addFlashAttribute("error", "You don't have permissions to change this project");
+            return true;
+        }
+        return false;
     }
 }

@@ -23,7 +23,8 @@ public class HomeController {
         if (auth != null) {
             CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
             User authedUser = userRepo.findByEmail(userDetails.getUsername());
-            userDetails.getUser().setProjects(authedUser.getProjects());
+            userDetails.updateUserDetails(authedUser);
+
             List<Project> userProjects = userDetails.getUser().getProjects();
 
             m.addAttribute("accessibleProjects", userProjects);

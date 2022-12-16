@@ -2,24 +2,24 @@ package cz.uhk.pproproject.model;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Required;
 
-import javax.management.relation.Role;
 import javax.persistence.*;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @NoArgsConstructor
-public class User extends BaseModel{
+public class User extends BaseModel implements Comparable<User>{
     public User(String email, String firstName, String lastName, RoleEnum role) {
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
         this.role = role;
     }
+
+    @Getter @Setter
+    @OneToOne(targetEntity = Contact.class, fetch = FetchType.EAGER)
+    private Contact contact;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -71,9 +71,19 @@ public class User extends BaseModel{
     public void addProject(Project project){
         this.projects.add(project);
     }
-
+    public void removeFromProject(Project project) {this.projects.remove(project);}
+    public boolean hasHigherRole(){
+        return (this.role == RoleEnum.ADMIN || this.role == RoleEnum.OWNER);
+    }
     public String getFullName(){
         return firstName + " " + lastName;
+    }
+
+    @Override
+    public int compareTo(User user){
+        int last = this.firstName.compareTo(user.firstName);
+        //Sorting by first name if last name is same d
+        return last == 0 ? this.lastName.compareTo(user.lastName) : last;
     }
 }
 

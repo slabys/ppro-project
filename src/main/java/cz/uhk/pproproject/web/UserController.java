@@ -22,11 +22,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.*;
+
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @PropertySource("classpath:application.properties")
 @Controller
@@ -161,20 +164,13 @@ public class UserController {
     }
 
 
-    //test of permissions + retrieving logged user data
     @GetMapping("/dashboard/users")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
     public String listUsers(Model model, Authentication auth) {
         List<User> listUsers = userRepo.findAll();
         model.addAttribute("listUsers", listUsers);
 
-        /* GET USER IN CONTROLLER */
-        CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
-        System.out.println(userDetails.getAuthorities());
-        //System.out.println(userDetails.getUser().getRole());
-        //System.out.println(userDetails.getAuthorities());
-
-        return "users";
+        return "user/userList";
     }
 
     @GetMapping("/login")
@@ -185,5 +181,16 @@ public class UserController {
         } else {
             return "forms/user/login";
         }
+    }
+
+    @GetMapping("/dashboard/user/detail/{id}")
+    public String showUserDetails(Model m, @PathVariable long id, RedirectAttributes redirectAttrs){
+        Optional<User> user = userRepo.findById(id);
+        if(user.isEmpty()) {
+            redirectAttrs.addFlashAttribute("error","This user does not exists!");
+            throw new ResponseStatusException(NOT_FOUND, "Unable to find user details");
+        }
+        m.addAttribute("user",user.get());
+        return "user/userDetail";
     }
 }

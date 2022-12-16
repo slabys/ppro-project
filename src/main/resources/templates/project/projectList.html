@@ -11,7 +11,7 @@
             <div>
                 <h1>List of projects</h1>
             </div>
-            <table class="table table-striped table-bordered">
+            <table class="table table-striped table-bordered text-center">
                 <div class="d-flex py-2 justify-content-end" sec:authorize="hasRole('ROLE_OWNER')">
                     <a th:href="@{/dashboard/project/manage/new}"><button class="btn btn-danger btn-md">Create new project</button></a>
                 </div>
@@ -22,6 +22,7 @@
                     <th>Project assigned to</th>
                     <th>Detail</th>
                     <th>Edit</th>
+                    <th>Add/remove employees</th>
                     <th sec:authorize="hasRole('ROLE_OWNER')">Assign to new user</th>
                 </tr>
                 </thead>
@@ -30,15 +31,22 @@
                     <td th:text="${project.id}">Project ID</td>
                     <td th:text="${project.name}">Project name</td>
                     <td><span th:text="${project.projectOwner?.getFullName()?:'No one assigned'}">No one assigned </span> <span th:text="'(' + ${#strings.capitalize(#strings.toLowerCase(project.projectOwner?.role))?:'No role'} + ')'"></span></td>
-                    <td><a th:href="@{'/dashboard/project/detail/'+${project.id}}"><i class="fa-solid fa-magnifying-glass"></i></a></td>
-                    <td><a th:href="@{'/dashboard/project/manage/'+${project.id}+'/edit'}"><i class="fa-solid fa-pen-to-square"></i></a></td>
-                    <td><a th:href="@{'/dashboard/project/manage/'+${project.id}+'/setOwner'}" sec:authorize="hasRole('ROLE_OWNER')"><i class="fa-solid fa-user-pen"></i></a></td>
+                    <td><a th:title="'Show details of '+${project.name}" th:href="@{'/dashboard/project/detail/'+${project.id}}"><i class="fa-solid fa-magnifying-glass"></i></a></td>
+                    <td th:if="${project.projectOwner == #authentication.getPrincipal().getUser() || #authentication.getPrincipal().getUser().hasHigherRole()}"><a th:href="@{'/dashboard/project/manage/edit/'+${project.id}}"><i class="fa-solid fa-pen-to-square"></i></a></td>
+                    <td th:if="${project.projectOwner == #authentication.getPrincipal().getUser() || #authentication.getPrincipal().getUser().hasHigherRole()}">
+                        <a title="Add people to project" th:href="@{'/dashboard/project/manage/addPeople/'+${project.id}}"><i class="fa-solid fa-user-plus"></i></a>
+                            <span> / </span>
+                        <a title="Remove poeple from project" th:href="@{'/dashboard/project/manage/removePeople/'+${project.id}}"><i class="fa-solid fa-user-minus"></i></a>
+                    </td>
+                    <td th:if="${project.projectOwner != #authentication.getPrincipal().getUser() && !#authentication.getPrincipal().getUser().hasHigherRole()}"><a th:href="@{''}"><i class="fa-solid fa-circle-xmark"></i></a></td>
+                    <td th:if="${project.projectOwner != #authentication.getPrincipal().getUser() && !#authentication.getPrincipal().getUser().hasHigherRole()}"><a th:href="@{''}"><i class="fa-solid fa-circle-xmark"></i></a></td>
+                    <td sec:authorize="hasRole('ROLE_OWNER')"><a th:href="@{'/dashboard/project/manage/setOwner/'+${project.id}}"><i class="fa-solid fa-user-pen"></i></a></td>
                 </tr>
                 </tbody>
             </table>
         </div>
     <div th:if="${projects.isEmpty()}">
-        <h4>There are no projects right now! Add one!</h4>
+        <h4>There are no projects right now!</h4>
         <div class="justify-content-end" sec:authorize="hasRole('ROLE_OWNER')">
             <a th:href="@{/dashboard/project/manage/new}"><button class="btn btn-danger btn-md">Create new project</button></a>
         </div>

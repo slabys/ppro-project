@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Employerr - Set employees to project</title>
+</head>
+<body>
+<section layout:fragment="content" class="container py-4">
+
+    <div class="d-flex flex-column shadow gap-4">
+        <div class="card p-4">
+            <div th:if="${addPeople == true}">
+            <h2><i class="bi bi-card-text pe-4"></i>All available users you can add to project "<b><span th:text="${project.name}"></span></b>"</h2>
+            <p>List below shows all active users that are not assigned to this project.
+                You can add more by selecting from list and confirming form. <br/>
+                Next to the user is button to show details of each user. <br />
+            </p>
+            </div>
+            <div th:if="${addPeople == false}">
+                <h2><i class="bi bi-card-text pe-4"></i>All available users you can remove from project "<b><span th:text="${project.name}"></span></b>"</h2>
+                <p>List below shows all active users that are assigned to this project.
+                    You can remove them by selecting from list and confirming form. <br/>
+                    Next to the user is button to show details of each user. <br />
+                </p>
+            </div>
+            <hr>
+            <div class="alert alert-primary" role="alert" th:text="${info}" th:if="${info}"></div>
+            <div class="alert alert-danger" role="alert" th:text="${error}" th:if="${error}"></div>
+            <form th:action="${addPeople} ? @{/dashboard/project/manage/addPeople} : @{/dashboard/project/manage/removePeople}" th:method="POST" >
+                <input type="hidden" name="id" th:value="${project.id}">
+                <div th:if="${higherRoles.size != 0}">
+                    <h4>Admin and owner role</h4>
+                    <div class="d-flex flex-wrap">
+                        <div th:each="user: ${higherRoles}" class="col-sm-4 mb-3">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" th:value="${user.id}" name="users">
+                                <label class="form-check-label" th:text="${user.getFullName()}"> </label>
+                                <a target="_blank" th:href="@{'/dashboard/user/detail/'+${user.id}}"><i class="fa-solid fa-magnifying-glass"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                    <div th:if="${managers.size != 0}">
+                        <h4>Manager role</h4>
+                        <div class="d-flex flex-wrap">
+                        <div th:each="user: ${managers}" class="col-sm-4 mb-3">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" th:id="'user-'+${user.id}" type="checkbox" th:value="${user.id}" name="users">
+                                <label class="form-check-label" th:for="'user-'+${user.id}" th:text="${user.getFullName()}"> </label>
+                                <a target="_blank" th:href="@{'/dashboard/user/detail/'+${user.id}}"><i class="fa-solid fa-magnifying-glass"></i></a></div>
+                        </div>
+                    </div>
+                    </div>
+
+                    <div th:if="${employees.size != 0}">
+                        <h4>Employee role</h4>
+                        <div class="d-flex flex-wrap">
+                            <div th:each="user: ${employees}" class="col-sm-4 mb-3">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" th:id="'user-'+${user.id}" type="checkbox" th:value="${user.id}" name="users">
+                                    <label class="form-check-label" th:for="'user-'+${user.id}" th:text="${user.getFullName()}"> </label>
+                                    <a target="_blank" th:href="@{'/dashboard/user/detail/'+${user.id}}"><i class="fa-solid fa-magnifying-glass"></i></a>
+                                </div>
+                               </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end py-4">
+                        <button type="submit" class="btn btn-md btn-danger"><span th:text="${addPeople? 'Assign selected employees to project' : 'Remove selected employees from project'}"></span></button>
+                    </div>
+                </form>
+        </div>
+    </div>
+
+</section>
+</body>
+</html>
