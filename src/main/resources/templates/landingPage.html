@@ -37,7 +37,7 @@
 
                 <label><b>Contact state:</b></label>
                 <div class="alert alert-danger" role="alert" th:if="${#authentication.getPrincipal().getUser().getContact()} == null"><span>Please add contact details to your account</span></div>
-                <div class="alert alert-danger" role="alert" th:if="${#authentication.getPrincipal().getUser().getContact()} != null"><span th:text="${#authentication.getPrincipal().getUser().getContact().getFullAddress()}"></span></div>
+                <div th:if="${#authentication.getPrincipal().getUser().getContact()} != null"><span th:text="${#authentication.getPrincipal().getUser().getContact().getFullAddress()}"></span></div>
             </div>
         </div>
         <div style="flex: 1">
