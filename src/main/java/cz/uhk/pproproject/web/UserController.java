@@ -1,10 +1,8 @@
 package cz.uhk.pproproject.web;
 
 import cz.uhk.pproproject.middleware.CustomUserDetails;
-import cz.uhk.pproproject.model.Email;
-import cz.uhk.pproproject.model.RoleEnum;
-import cz.uhk.pproproject.model.User;
-import cz.uhk.pproproject.model.UserActivationToken;
+import cz.uhk.pproproject.model.*;
+import cz.uhk.pproproject.repository.ContactRepository;
 import cz.uhk.pproproject.repository.EmailRepository;
 import cz.uhk.pproproject.repository.UserActivationTokenRepository;
 import cz.uhk.pproproject.repository.UserRepository;
@@ -40,6 +38,8 @@ public class UserController {
     private UserRepository userRepo;
     @Autowired
     private UserActivationTokenRepository uatRepo;
+    @Autowired
+    private ContactRepository contactRepository;
     @Autowired
     private EmailRepository emailRepo;
     @Value("${userAccounts.daysForExpire}")
@@ -192,5 +192,34 @@ public class UserController {
         }
         m.addAttribute("user",user.get());
         return "user/userDetail";
+    }
+
+    @GetMapping("/dashboard/user/editMyAccount")
+    public String showUserEditForm(Model m, Authentication auth){
+        CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+        Optional<User> user = userRepo.findById(userDetails.getUser().getId());
+        user.ifPresent(value -> {
+            m.addAttribute("user", value);
+            if(user.get().getContact() == null){
+                m.addAttribute("contact",new Contact());
+            }else{
+                m.addAttribute("contact",user.get().getContact());
+            }
+        });
+        return "forms/user/editAccount";
+    }
+    @PostMapping("/dashboard/user/edit")
+    public String editLoggedUser(RedirectAttributes redirectAttributes, Authentication auth, User user, Contact contact){
+        User editedUser = userRepo.findByEmail(user.getEmail());
+
+        user.setId(editedUser.getId());
+        user.setRole(editedUser.getRole());
+        user.setActive(editedUser.isActive());
+
+        contactRepository.save(contact);
+        user.setContact(contact);
+        userRepo.save(user);
+        redirectAttributes.addFlashAttribute("info","User edited successfully");
+        return "redirect:/";
     }
 }

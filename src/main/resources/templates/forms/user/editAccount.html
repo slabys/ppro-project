@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Employerr - Edit my account</title>
+</head>
+<body>
+<section layout:fragment="content" class="container text-center">
+    <div class="py-3">
+        <h1>Edit user account - <span th:text="${user.getFullName()}"></span></h1>
+    </div>
+    <div class="alert alert-primary" role="alert" th:text="${info}" th:if="${info}"></div>
+    <div class="alert alert-danger" role="alert" th:text="${error}" th:if="${error}"></div>
+    <form th:action="@{/dashboard/user/edit}"
+          method="post" class="d-flex justify-content-center">
+        <div class="rounded-2 p-2 shadow-lg w-75">
+            <div class="row py-4">
+                <h4><i class="fa-solid fa-circle-info"></i> Basic information</h4>
+                <input type="hidden" th:field="${user.email}">
+                <input type="hidden" th:field="${user.password}">
+                <div class="col-md-6">
+                    <div class="form-group row p-2">
+                        <label class="col-4 col-form-label"><i class="fa-solid fa-contact-card"></i> First name:
+                        </label>
+                        <div class="col-8">
+                            <input type="text" th:field="*{user.firstName}" class="form-control"
+                                   required/>
+                        </div>
+                    </div>
+                    <div class="form-group row p-2">
+                        <label class="col-4 col-form-label"><i class="fa-solid fa-contact-card"></i> Last name: </label>
+                        <div class="col-8">
+                            <input type="text" th:field="*{user.lastName}" class="form-control"
+                                   required/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row p-2">
+                        <label class="col-4 col-form-label"><i class="fa-solid fa-sack-dollar"></i> Salary: </label>
+                        <div class="col-8">
+                            <input type="number" th:field="*{user.salary}" readonly="readonly" class="form-control"
+                                   required/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="py-4">
+                <div class="row justify-content-center">
+                    <h4><i class="fa-solid fa-address-card"></i> Contact information</h4>
+                    <input type="hidden" th:field="${contact.id}">
+                    <div class="col-md-6">
+                        <div class="form-group row p-2">
+                            <label class="col-4 col-form-label"><i class="fa-solid fa-street-view"></i> Street: </label>
+                            <div class="col-8">
+                                <input type="text" th:field="*{contact.street}" class="form-control" required/>
+                            </div>
+                        </div>
+
+                        <div class="form-group row p-2">
+                            <label class="col-4 col-form-label"><i class="fa-solid fa-building"></i> City: </label>
+                            <div class="col-8">
+                                <input type="text" th:field="*{contact.city}" class="form-control" required/>
+                            </div>
+                        </div>
+
+                        <div class="form-group row p-2">
+                            <label class="col-4 col-form-label"><i class="fa-solid fa-globe"></i> State: </label>
+                            <div class="col-8">
+                                <input name="state" type="text" th:field="*{contact.state}" class="form-control" required/>
+                            </div>
+                        </div>
+
+                        <div class="form-group row p-2">
+                            <label class="col-4 col-form-label"><i class="fa-solid fa-hashtag"></i> Zip code: </label>
+                            <div class="col-8">
+                                <input type="text" th:field="*{contact.zipCode}" class="form-control" required/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 py-4">
+                        <div class="form-group row p-2">
+                            <label class="col-4 col-form-label"><i class="fa-solid fa-phone"></i> Phone: </label>
+                            <div class="col-8">
+                                <input type="number" th:field="*{contact.phone}" class="form-control" required/>
+                            </div>
+                        </div>
+                        <div class="form-group row p-2">
+                            <label class="col-4 col-form-label"><i class="fa-solid fa-building-columns"></i> Bank
+                                account: </label>
+                            <div class="col-8">
+                                <input type="text" th:field="*{contact.bankAccount}" class="form-control"
+                                       required/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-2">
+                <button type="submit" class="btn btn-danger">Save changes</button>
+            </div>
+        </div>
+    </form>
+</section>
+</body>
+</html>
