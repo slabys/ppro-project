@@ -1,0 +1,17 @@
+version: "3"
+services:
+  web:
+    build: ./
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=employerr
+  db:
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=employerr
+      - MYSQL_DATABASE=employerr
+    ports:
+      - "13306:13306"
