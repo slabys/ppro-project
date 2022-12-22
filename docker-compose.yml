@@ -11,7 +11,7 @@ services:
   db:
     image: mysql:8.0
     environment:
-      - MYSQL_ROOT_PASSWORD=employerr
-      - MYSQL_DATABASE=employerr
+      - MARIADB_ROOT_PASSWORD=employerr
+      - MARIADB_DATABASE=employerr
     ports:
-      - "3306:3306"
+      - "13306:13306"
