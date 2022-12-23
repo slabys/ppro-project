@@ -14,4 +14,4 @@ services:
       - MARIADB_ROOT_PASSWORD=employerr
       - MARIADB_DATABASE=employerr
     ports:
-      - "13306:13306"
+      - "13306:3306"
