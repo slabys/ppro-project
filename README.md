@@ -10,7 +10,7 @@ docker run -p 3306:3306 --name employerr -e MARIADB_ROOT_PASSWORD=employerr -d m
 ## Docker
 ```
 docker compose build
-docker compose run
+docker compose up
 ```
 
 

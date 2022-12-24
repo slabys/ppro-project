@@ -184,42 +184,49 @@ public class UserController {
     }
 
     @GetMapping("/dashboard/user/detail/{id}")
-    public String showUserDetails(Model m, @PathVariable long id, RedirectAttributes redirectAttrs){
+    public String showUserDetails(Model m, @PathVariable long id, RedirectAttributes redirectAttrs) {
         Optional<User> user = userRepo.findById(id);
-        if(user.isEmpty()) {
-            redirectAttrs.addFlashAttribute("error","This user does not exists!");
+        if (user.isEmpty()) {
+            redirectAttrs.addFlashAttribute("error", "This user does not exists!");
             throw new ResponseStatusException(NOT_FOUND, "Unable to find user details");
         }
-        m.addAttribute("user",user.get());
+        m.addAttribute("user", user.get());
         return "user/userDetail";
     }
 
     @GetMapping("/dashboard/user/editMyAccount")
-    public String showUserEditForm(Model m, Authentication auth){
+    public String showUserEditForm(Model m, Authentication auth) {
         CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
         Optional<User> user = userRepo.findById(userDetails.getUser().getId());
         user.ifPresent(value -> {
             m.addAttribute("user", value);
-            if(user.get().getContact() == null){
-                m.addAttribute("contact",new Contact());
-            }else{
-                m.addAttribute("contact",user.get().getContact());
+            if (user.get().getContact() == null) {
+                m.addAttribute("contact", new Contact());
+            } else {
+                m.addAttribute("contact", user.get().getContact());
             }
         });
         return "forms/user/editAccount";
     }
+
     @PostMapping("/dashboard/user/edit")
-    public String editLoggedUser(RedirectAttributes redirectAttributes, Authentication auth, User user, Contact contact){
+    public String editLoggedUser(RedirectAttributes redirectAttributes, User user, Contact contact) {
         User editedUser = userRepo.findByEmail(user.getEmail());
 
         user.setId(editedUser.getId());
         user.setRole(editedUser.getRole());
         user.setActive(editedUser.isActive());
 
-        contactRepository.save(contact);
-        user.setContact(contact);
+        contact.checkForEmptyValues();
+        if(contact.isContactUnset()){
+            user.setContact(null);
+        } else {
+            contactRepository.save(contact);
+            user.setContact(contact);
+        }
+
         userRepo.save(user);
-        redirectAttributes.addFlashAttribute("info","User edited successfully");
+        redirectAttributes.addFlashAttribute("info", "User edited successfully");
         return "redirect:/";
     }
 }
