@@ -1,9 +1,12 @@
 package cz.uhk.pproproject.model;
 
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.util.Date;
 
 @MappedSuperclass
+@NoArgsConstructor
 public abstract class BaseModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,5 +1,6 @@
 package cz.uhk.pproproject;
 
+import cz.uhk.pproproject.model.Contact;
 import cz.uhk.pproproject.model.RoleEnum;
 import cz.uhk.pproproject.model.User;
 import cz.uhk.pproproject.repository.UserRepository;
@@ -30,7 +31,9 @@ public class DatabaseSeeder {
             User admin = new User("admin@employerr.com","Arnoštek","Šimravý", RoleEnum.ADMIN);
             BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
             String encodedPassword = passwordEncoder.encode("123456789");
+            admin.setRegistrationEmail("admin@employerr.com");
             admin.setPassword(encodedPassword);
+            admin.setContact(new Contact());
             admin.setSalary(9000);
             admin.setActive(true);
             userRepo.save(admin);

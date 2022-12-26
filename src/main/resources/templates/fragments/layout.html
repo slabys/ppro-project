@@ -31,9 +31,9 @@
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
           </div>
           <div class="offcanvas-body container d-flex gap-4 flex-column flex-lg-row align-items-center">
-            <a class="d-inline-flex" th:href="@{/}"><i class="bi-speedometer2 pe-2"></i>Dashboard</a>
-            <a class="d-inline-flex" th:href="@{/dashboard/project/list/user}"><i
-              class="bi-kanban pe-2"></i>Projects</a>
+            <a class="d-inline-flex text-nowrap" th:href="@{/}"><i class="bi-speedometer2 pe-2"></i>Dashboard</a>
+            <a class="d-inline-flex text-nowrap" th:href="@{/dashboard/project/list/user}"><i
+              class="bi-kanban pe-2"></i>My Projects</a>
             <div sec:authorize="!isAuthenticated()">
               <a class="d-inline-flex" th:href="@{/login}"><i class="bi-box-arrow-in-right pe-2"></i>Login</a>
             </div>

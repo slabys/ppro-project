@@ -27,7 +27,7 @@ public class Contact extends BaseModel {
         return street + ", " + city + ", " + zipCode + ", " + state;
     }
 
-    public void checkForEmptyValues() {
+    public void setEmptyValuesToNull() {
         if (this.getCity().trim().equals("")) this.setCity(null);
         if (this.getStreet().trim().equals("")) this.setStreet(null);
         if (this.getState().trim().equals("")) this.setState(null);
@@ -42,8 +42,6 @@ public class Contact extends BaseModel {
     }
 
     public boolean isContactUnset() {
-        return this.getCity() == null && this.getStreet() == null &&
-                this.getState() == null && this.getZipCode() == null &&
-                this.getPhone() == null && this.getBankAccount() == null;
+        return isAddressUnset() && this.getPhone() == null && this.getBankAccount() == null;
     }
 }

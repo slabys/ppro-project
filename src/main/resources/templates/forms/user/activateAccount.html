@@ -1,8 +1,24 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/layout}">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <script>
+      document.getElementById("repeatPassword").addEventListener("change", textChangeInsideInput)
+
+      function textChangeInsideInput() {
+          const password = document.getElementById("password").value
+          const repeatPassword = document.getElementById("repeatPassword").value
+          const submitButton = document.getElementById("submitButton");
+          const errorLog = document.getElementById("passwordError");
+          submitButton.disabled = password.toString() !== repeatPassword.toString();
+          if (password.toString() !== repeatPassword.toString() || password === "" || repeatPassword === "") {
+              errorLog.innerText = "Password doesn't match, please try rewrite password again."
+          } else {
+              errorLog.innerText = ""
+          }
+      }
+  </script>
 </head>
 <body>
 <section layout:fragment="content" class="container text-center">
@@ -17,20 +33,29 @@
       <div class="form-group row p-2">
         <label class="col-4 col-form-label">E-mail: </label>
         <div class="col-8">
-          <input type="email" th:field="*{email}" readonly="readonly" class="form-control" required />
+          <input type="email" th:field="*{email}" class="form-control" required readonly/>
         </div>
       </div>
 
       <div class="form-group row p-2">
         <label class="col-4 col-form-label">Password: </label>
         <div class="col-8">
-          <input type="password" th:field="*{password}" class="form-control"
-                 required minlength="2" maxlength="20"/>
+          <input type="password" th:field="*{password}" id="password" th:onchange="textChangeInsideInput()"
+                 class="form-control" required minlength="2" maxlength="20"/>
+        </div>
+      </div>
+
+      <div class="form-group row p-2">
+        <label class="col-4 col-form-label">Repeat password: </label>
+        <div class="col-8">
+          <input type="text" th:value="${repeatPassword}" id="repeatPassword" th:onchange="textChangeInsideInput()"
+                 class="form-control" required minlength="2" maxlength="20"/>
         </div>
       </div>
 
       <div class="p-2">
-        <button type="submit" class="btn btn-primary">Sign Up</button>
+        <button type="submit" id="submitButton" class="btn btn-primary" disabled>Sign Up</button>
+        <p class="text-danger" id="passwordError"></p>
       </div>
     </div>
   </form>

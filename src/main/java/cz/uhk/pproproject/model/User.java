@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @NoArgsConstructor
@@ -15,6 +16,7 @@ public class User extends BaseModel implements Comparable<User>{
         this.firstName = firstName;
         this.lastName = lastName;
         this.role = role;
+        this.contact = new Contact();
     }
 
     @Getter @Setter
@@ -27,6 +29,9 @@ public class User extends BaseModel implements Comparable<User>{
     private RoleEnum role;
     @Column(nullable = false, unique = true, length = 45) @Setter @Getter
     private String email;
+
+    @Column(nullable = true, unique = true, length = 45) @Setter @Getter
+    private String registrationEmail;
     @Column(nullable = false, length = 20) @Setter @Getter
     private String firstName;
     @Column(nullable = false, length = 20) @Setter @Getter
@@ -63,10 +68,9 @@ public class User extends BaseModel implements Comparable<User>{
     @JoinTable(name = "user_project",
             joinColumns = { @JoinColumn(name = "user_id") },
             inverseJoinColumns = { @JoinColumn(name = "project_id") })
-
     private List<Project> projects;
     public boolean hasAccessToProject(Project project){
-        return projects.contains(project);
+        return this.projects.contains(project) || this.getRole() == RoleEnum.ADMIN || Objects.equals(project.getProjectOwner().getId(), this.getId());
     }
     public void addProject(Project project){
         this.projects.add(project);

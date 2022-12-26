@@ -20,3 +20,10 @@ button:hover {
     color: var(--bs-white);
     transition: all 300ms;
 }
+
+.form-control:read-only {
+    background-color: #e9ecef;
+    cursor: default;
+    box-shadow: none;
+    opacity: 1;
+}

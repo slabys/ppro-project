@@ -9,9 +9,6 @@
     <div class="py-4">
         <h1>User Registration - Sign Up</h1>
 
-        <div class="alert alert-primary" role="alert" th:text="${info}" th:if="${info}"></div>
-        <div class="alert alert-danger" role="alert" th:text="${error}" th:if="${error}"></div>
-
         <div class="container-lg d-flex flex-column" style="max-width: 38rem;">
             <form th:action="@{/dashboard/registerUser}" th:object="${user}"
                   method="post">
@@ -42,6 +39,16 @@
                     <div class="col-sm-12 col-md-9">
                         <div class="input-group">
                             <input type="text" th:field="*{lastName}" class="form-control" placeholder="Lastname"
+                                   aria-label="Lastname" required minlength="2" maxlength="20">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group row py-1">
+                    <label class="col-form-label col-sm-12 col-md-3 text-start">Registration e-mail:</label>
+                    <div class="col-sm-12 col-md-9">
+                        <div class="input-group">
+                            <input type="text" th:field="*{registrationEmail}" class="form-control" placeholder="Registration e-mail"
                                    aria-label="Lastname" required minlength="2" maxlength="20">
                         </div>
                     </div>
