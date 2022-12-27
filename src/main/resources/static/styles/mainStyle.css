@@ -27,3 +27,27 @@ button:hover {
     box-shadow: none;
     opacity: 1;
 }
+
+table {
+    table-layout: fixed;
+}
+
+.table tr > td {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.innerRichText {
+    max-height: 2.5rem;
+    display: flex;
+}
+.innerRichText > * {
+    font-family: unset;
+    font-style: unset;
+    font-size: unset;
+    line-height: unset;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin: 0;
+}

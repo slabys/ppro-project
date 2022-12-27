@@ -11,7 +11,7 @@
     <div th:if="${project != null}" class="d-flex flex-column shadow gap-4">
         <div class="card p-4">
             <h2><i class="bi bi-card-text pe-4"></i>Set owner of project: <span th:text="${project.name}"></span></h2>
-            <hr>
+            <hr/>
             <div class="alert alert-primary" role="alert" th:text="${info}" th:if="${info}"></div>
             <div class="alert alert-danger" role="alert" th:text="${error}" th:if="${error}"></div>
 
