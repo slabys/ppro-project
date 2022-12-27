@@ -29,6 +29,9 @@
             <div class="alert alert-danger" role="alert" th:text="${error}" th:if="${error}"></div>
             <form th:action="${addPeople} ? @{/dashboard/project/manage/addPeople} : @{/dashboard/project/manage/removePeople}" th:method="POST" >
                 <input type="hidden" name="id" th:value="${project.id}">
+                <div th:if="${higherRoles.size == 0 && managers.size == 0 && employees.size == 0}">
+                    <h4>There are no people to manage!</h4>
+                </div>
                 <div th:if="${higherRoles.size != 0}">
                     <h4>Admin and owner role</h4>
                     <div class="d-flex flex-wrap">
@@ -66,8 +69,10 @@
                         </div>
                     </div>
 
-                    <div class="d-flex justify-content-end py-4">
-                        <button type="submit" class="btn btn-md btn-danger"><span th:text="${addPeople? 'Assign selected employees to project' : 'Remove selected employees from project'}"></span></button>
+                    <div th:if="${higherRoles.size != 0 || managers.size != 0 || employees.size != 0}">
+                        <div class="d-flex justify-content-end py-4">
+                            <button type="submit" class="btn btn-md btn-danger"><span th:text="${addPeople? 'Assign selected employees to project' : 'Remove selected employees from project'}"></span></button>
+                        </div>
                     </div>
                 </form>
         </div>

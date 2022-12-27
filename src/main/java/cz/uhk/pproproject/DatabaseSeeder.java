@@ -3,6 +3,7 @@ package cz.uhk.pproproject;
 import cz.uhk.pproproject.model.Contact;
 import cz.uhk.pproproject.model.RoleEnum;
 import cz.uhk.pproproject.model.User;
+import cz.uhk.pproproject.repository.ContactRepository;
 import cz.uhk.pproproject.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class DatabaseSeeder {
     @Autowired
     private UserRepository userRepo;
+    @Autowired
+    private ContactRepository contactRepository;
 
     @GetMapping("/seedDatabase")
     public String seed(RedirectAttributes redirectAttributes) {
@@ -33,9 +36,11 @@ public class DatabaseSeeder {
             String encodedPassword = passwordEncoder.encode("123456789");
             admin.setRegistrationEmail("admin@employerr.com");
             admin.setPassword(encodedPassword);
-            admin.setContact(new Contact());
             admin.setSalary(9000);
             admin.setActive(true);
+            Contact contact = new Contact();
+            contactRepository.save(contact);
+            admin.setContact(contact);
             userRepo.save(admin);
         } else {
             System.out.println("No need to seed db, proceeding");

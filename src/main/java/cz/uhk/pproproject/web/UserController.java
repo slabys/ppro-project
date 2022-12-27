@@ -98,7 +98,7 @@ public class UserController {
         if (Objects.equals(env, "prod"))
             emailService.sendSimpleMail(new EmailDetails(successEmail.getSendTo().getRegistrationEmail(), successEmail.getContent(), successEmail.getSubject(), null));
 
-        redirectAttrs.addFlashAttribute("info", "You have successfully activated your account. You may not login.");
+        redirectAttrs.addFlashAttribute("info", "You have successfully activated your account. You may now login into system.");
         return "redirect:/login";
     }
 
@@ -217,7 +217,7 @@ public class UserController {
 
         contact.setEmptyValuesToNull();
         contactRepository.save(contact);
-        user.setContact(contact);
+        findUser.setContact(contact);
 
         userRepo.save(findUser);
         redirectAttributes.addFlashAttribute("info", "User edited successfully");

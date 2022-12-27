@@ -38,8 +38,9 @@
 
 
         <label><b><u>ADDRESS</u></b></label>
+        <div th:if="${#authentication.getPrincipal().getUser().getContact()}">
         <div class="alert alert-danger" role="alert"
-             th:if="${#authentication.getPrincipal().getUser().getContact().isAddressUnset()}">
+             th:if="${#authentication.getPrincipal().getUser().getContact()?.isAddressUnset()}">
           <span>Please add contact details to your account</span>
         </div>
         <div class="d-flex flex-column" th:if="!${#authentication.getPrincipal().getUser().getContact().isAddressUnset()}">
@@ -60,7 +61,11 @@
             Zip code:
             <span th:text="${#authentication.getPrincipal().getUser().getContact().zipCode} ?: 'Unknown'"></span>
           </label>
-
+        </div>
+        </div>
+        <div class="alert alert-danger" role="alert"
+             th:if="${#authentication.getPrincipal().getUser().getContact() == null}">
+          <span>Please add contact details to your account</span>
         </div>
       </div>
     </div>
