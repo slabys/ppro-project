@@ -211,13 +211,39 @@ public class UserController {
         return "forms/user/editAccount";
     }
 
+    @GetMapping("/dashboard/user/edit/{id}")
+    @PreAuthorize("hasRole('ROLE_OWNER')")
+    public String showPrivilegedUserEditForm(Model m, Authentication auth, @PathVariable long id) {
+        Optional<User> user = userRepo.findById(id);
+
+        user.ifPresent(value -> {
+            m.addAttribute("user", value);
+            if (user.get().getContact() == null) {
+                m.addAttribute("contact", new Contact());
+            } else {
+                m.addAttribute("contact", user.get().getContact());
+            }
+        });
+        m.addAttribute("editOtherAccount",true);
+
+        return "forms/user/editAccount";
+    }
+
     @PostMapping("/dashboard/user/edit")
     public String editLoggedUser(RedirectAttributes redirectAttributes, User user, Contact contact) {
-        User findUser = userRepo.findByEmail(user.getEmail());
-
+        User findUser;
+        try {
+            findUser = userRepo.findById(user.getId()).get();
+        }catch (NoSuchElementException error){
+            redirectAttributes.addFlashAttribute("error", "This user was not found!");
+            throw new ResponseStatusException(NOT_FOUND, "Unable to find user details");
+        }
         contact.setEmptyValuesToNull();
         contactRepository.save(contact);
         findUser.setContact(contact);
+        findUser.setFirstName(user.getFirstName());
+        findUser.setLastName(user.getLastName());
+        findUser.setSalary(user.getSalary());
 
         userRepo.save(findUser);
         redirectAttributes.addFlashAttribute("info", "User edited successfully");
