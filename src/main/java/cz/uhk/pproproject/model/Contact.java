@@ -30,8 +30,8 @@ public class Contact extends BaseModel {
     public void setEmptyValuesToNull() {
         if (this.getCity().trim().equals("")) this.setCity(null);
         if (this.getStreet().trim().equals("")) this.setStreet(null);
-        if (this.getState().trim().equals("")) this.setState(null);
         if (this.getZipCode().trim().equals("")) this.setZipCode(null);
+        if (this.getState().trim().equals("")) this.setState(null);
         if (this.getPhone().trim().equals("")) this.setPhone(null);
         if (this.getBankAccount().trim().equals("")) this.setBankAccount(null);
     }
