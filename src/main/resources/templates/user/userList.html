@@ -2,32 +2,26 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/layout}">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Employerr - user list</title>
 </head>
 <body>
 <section layout:fragment="content">
-    <div>
-        <form th:action="@{/logout}" method="post">
-            <p>
-                Welcome <b>[[${#request.userPrincipal.principal.fullName}]]</b>
-            </p>
-            <input type="submit" value="Sign Out"/>
-        </form>
-    </div>
-    <div>
-        <h1>List of Users</h1>
-    </div>
-
-    <div>
-        <table class="table table-striped table-bordered">
+    <div class="p-3" th:if="${!listUsers.isEmpty()}">
+        <div>
+            <h2>List of users</h2>
+            <p>On this page you can see all registered users. You can also view their details by clicking icon next to them.</p>
+            <hr>
+        </div>
+        <div>
+        <table id="userTable" class="table table-striped text-center table-bordered">
             <thead class="thead-dark">
             <tr>
                 <th>User ID</th>
-                <th>E-mail</th>
+                <th>Company E-mail</th>
                 <th>First Name</th>
                 <th>Last Name</th>
                 <th>Role</th>
-                <th>Is enabled?</th>
+                <th>Active</th>
             </tr>
             </thead>
             <tbody>
@@ -36,11 +30,23 @@
                 <td th:text="${user.email}">E-mail</td>
                 <td th:text="${user.firstName}">First Name</td>
                 <td th:text="${user.lastName}">Last Name</td>
-                <td th:text="${user.role}">Role</td>
-                <td th:text="${user.active}">Activation info</td>
+                <td th:text="${#strings.capitalize(#strings.toLowerCase(user.role))}">Role</td>
+                <td th:if="${user.active}"><i style="color:darkgreen"  class="fa-solid fa-circle-check"></i></td>
+                <td th:if="${!user.active}"><i style="color:darkred" class="fa-solid fa-circle-xmark"></i></td>
             </tr>
             </tbody>
         </table>
+        </div>
+        <script>
+            $(document).ready( function () {
+                $('#userTable').DataTable();
+            } );
+        </script>
+    </div>
+    <div class="p-3" th:if="${listUsers.isEmpty()}">
+        <div>
+            <h4>User list is empty! </h4>
+        </div>
     </div>
 </section>
 </body>
