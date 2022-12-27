@@ -16,7 +16,7 @@ public class Task extends BaseModel{
     @Column @Getter @Setter
     private String name;
 
-    @Getter @Setter @Column
+    @Getter @Setter @Column(columnDefinition = "RICH_TEXT", length=65555)
     private String content;
 
     @Getter @Setter

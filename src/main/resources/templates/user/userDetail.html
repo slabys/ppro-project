@@ -14,7 +14,7 @@
     <div class="p-3">
         <div class="p-2">
         <h4>Basic information</h4>
-        <hr>
+        <hr/>
         <div class="row">
             <div class="col-md-6">
                 <p><b>ID:</b> <span th:text="${user.id}"></span></p>
@@ -28,7 +28,7 @@
 
         <div th:if="${user.contact}"  class="p-2">
         <h4>Additional information</h4>
-        <hr>
+        <hr/>
         <div class="row">
             <div class="col-md-6">
                 <p><b>Address:</b></p>
@@ -46,7 +46,7 @@
 
         <div class="p-2">
         <h4>Data manipulation</h4>
-        <hr>
+        <hr/>
         <div class="row">
             <div class="col-md-6">
                 <p><b>Created at:</b> <span th:text="${#dates.format(user.createdAt, 'HH:mm:ss dd.MM.yyyy')}"></span></p>
@@ -57,7 +57,7 @@
 
         <div class="p-2">
             <h4>User is assigned to these projects</h4>
-            <hr>
+            <hr/>
             <div class="row">
                 <div class="col-md-12">
                     <table class="table table-striped table-bordered text-center">

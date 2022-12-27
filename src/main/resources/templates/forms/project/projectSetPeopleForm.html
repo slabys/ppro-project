@@ -24,7 +24,7 @@
                     Next to the user is button to show details of each user. <br />
                 </p>
             </div>
-            <hr>
+            <hr/>
             <div class="alert alert-primary" role="alert" th:text="${info}" th:if="${info}"></div>
             <div class="alert alert-danger" role="alert" th:text="${error}" th:if="${error}"></div>
             <form th:action="${addPeople} ? @{/dashboard/project/manage/addPeople} : @{/dashboard/project/manage/removePeople}" th:method="POST" >
