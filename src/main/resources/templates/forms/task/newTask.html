@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/layout}">
+<head>
+  <meta charset="UTF-8">
+  <title>Employerr - New task</title>
+</head>
+<body>
+<section layout:fragment="content" class="container py-4">
+
+  <div class="d-flex flex-column shadow gap-4">
+    <div class="card p-4">
+      <h2><i class="bi bi-card-text pe-4"></i>Task form</h2>
+      <div class="d-flex flex-column justify-content-end">
+        <form th:action="@{/dashboard/task/new}" th:object="${task}" th:method="POST">
+
+          <div class="form-group row py-1">
+            <h4>Basic task information</h4>
+            <hr/>
+            <label class="col-form-label text-start"><b>Task name:</b></label>
+            <div class="col-sm-12 col-md-6">
+              <div class="input-group">
+                <input type="text" th:field="*{name}" class="form-control" placeholder="Name of the task"
+                       aria-label="name" required minlength="2" maxlength="255">
+              </div>
+            </div>
+            <div class="col-sm-12 mt-5">
+              <div class="form-group">
+                <label for="editor"><b>Task content:</b></label>
+                <textarea type="text" id="editor" rows="4" placeholder="Task description" class="form-control"
+                          aria-label="Task description"
+                          th:field="*{content}" autocomplete="off"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex justify-content-end py-4">
+            <button type="submit" class="btn btn-md btn-danger">Create task</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.ckeditor.com/ckeditor5/35.4.0/super-build/ckeditor.js"></script>
+  <script>
+      ClassicEditor.create(document.getElementById("editor"), {
+          toolbar: {
+              items: [
+                  'heading', '|',
+                  'bold', 'italic', 'strikethrough', 'underline', 'code', 'subscript', 'superscript', 'removeFormat', '|',
+                  'bulletedList', 'numberedList', 'todoList', '|',
+                  'outdent', 'indent', '|',
+                  'undo', 'redo',
+                  '-',
+                  'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', 'highlight', '|',
+                  'alignment', '|',
+                  'link', 'blockQuote', '|',
+                  'specialCharacters', 'horizontalLine', 'pageBreak', '|',
+                  'textPartLanguage', '|',
+                  'sourceEditing'
+              ],
+              shouldNotGroupWhenFull: false
+          },
+          list: {
+              properties: {
+                  styles: true,
+                  startIndex: true,
+                  reversed: true
+              }
+          },
+          heading: {
+              options: [
+                  {model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph'},
+                  {model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1'},
+                  {model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2'},
+                  {model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3'},
+                  {model: 'heading4', view: 'h4', title: 'Heading 4', class: 'ck-heading_heading4'},
+                  {model: 'heading5', view: 'h5', title: 'Heading 5', class: 'ck-heading_heading5'},
+              ]
+          },
+          placeholder: 'Place your text here!',
+          htmlSupport: {
+              allow: [
+                  {
+                      name: /.*/,
+                      attributes: true,
+                      classes: true,
+                      styles: true
+                  }
+              ]
+          },
+          link: {
+              decorators: {
+                  addTargetToExternalLinks: true,
+                  defaultProtocol: 'https://',
+              }
+          },
+      });
+  </script>
+</section>
+</body>
+</html>

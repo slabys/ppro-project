@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/layout}">
+<head>
+  <meta charset="UTF-8">
+  <title>Employerr - Task detail</title>
+</head>
+<body>
+<section layout:fragment="content" class="container py-4">
+  <div class="d-flex flex-column">
+    <div class="d-flex justify-content-between">
+      <label>ID: Task name</label>
+      <label>Created by:</label>
+    </div>
+    <div class="d-flex justify-content-between">
+      <h2 class="m-0" th:text="${task.id} +': ' + ${task.name}">ID: name</h2>
+      <p class="d-flex justify-content-end flex-column text-end m-0">
+        <b th:text="${task.createdBy.fullName}">Creator</b>
+        <span th:text="${#dates.format(task.createdAt, 'dd.MM.yyyy')}"></span>
+      </p>
+    </div>
+  </div>
+  <hr/>
+  <div class="container">
+    <h4>Description:</h4>
+    <div class="card p-4">
+      <div class="row">
+        <div class="col-md-12" th:utext="${task.content}">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>
