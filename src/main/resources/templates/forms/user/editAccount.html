@@ -2,7 +2,7 @@
 <html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/layout}">
 <head>
   <meta charset="UTF-8">
-  <title>Employerr - Edit my account</title>
+  <title>Account edit</title>
 </head>
 <body>
 <section layout:fragment="content" class="container-lg text-center">
@@ -38,7 +38,7 @@
           <div class="form-group row p-2">
             <label class="col-4 col-form-label"><i class="fa-solid fa-sack-dollar"></i> Salary: </label>
             <div class="col-8" th:if="${editOtherAccount == null}">
-              <input type="number" th:field="*{user.salary}" readonly="readonly" class="form-control"
+              <input type="number" th:field="*{user.salary}" readonly class="form-control"
                      required/>
             </div>
             <div class="col-8" th:if="${editOtherAccount}">

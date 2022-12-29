@@ -2,87 +2,147 @@
 <html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/layout}">
 <head>
-    <meta charset="UTF-8">
-    <title>Employerr - Project detail</title>
+  <meta charset="UTF-8">
+  <title>Project detail</title>
 </head>
 <body>
 <section layout:fragment="content" class="container py-4">
-    <div>
-        <h1>Project details</h1>
+  <div class="d-flex justify-content-between align-items-center">
+    <h1>Project details</h1>
+    <a title="Edit project" th:href="@{'/dashboard/project/manage/edit/'+${project.id}}"><i
+      class="bi bi-pencil-fill h3"></i></a>
+  </div>
+
+  <div class="p-3">
+    <div class="p-2">
+      <h4>Basic information</h4>
+      <hr/>
+      <div class="row">
+        <div class="col-md-6">
+          <p><b>ID:</b> <span th:text="${project.id}"></span></p>
+          <p><b>Name of the project:</b> <span th:text="${project.name}"></span></p>
+        </div>
+      </div>
     </div>
 
-    <div class="p-3">
-        <div class="p-2">
-        <h4>Basic information</h4>
-        <hr/>
-        <div class="row">
-            <div class="col-md-6">
-                <p><b>ID:</b> <span th:text="${project.id}"></span></p>
-                <p><b>Name of the project:</b> <span th:text="${project.name}"></span></p>
-            </div>
+    <div class="p-2">
+      <h4>Additional information</h4>
+      <hr/>
+      <div class="row">
+        <div class="col-md-6">
+          <p><b>Assigned owner:</b>
+            <span th:text="${project.projectOwner?.getFullName()?:'No one assigned'}">No one assigned </span>
+            <span
+              th:text="'(' + ${#strings.capitalize(#strings.toLowerCase(project.projectOwner?.role))?:'No role'} + ')'"></span>
+            <a target="_blank" th:title="'Show details of '+${project.projectOwner?.getFullName()}"
+               th:href="@{'/dashboard/user/detail/'+${project.projectOwner?.id}}">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </a>
+          </p>
+          <p><b>Description:</b> <span th:text="${project.description}"></span></p>
         </div>
+        <div class="col-md-6">
+          <p><b>URL:</b> <span th:text="${project.url}"></span></p>
+          <p><b>Project info:</b> <span th:text="${project.projectInfo}"></span></p>
         </div>
-
-        <div class="p-2">
-        <h4>Additional information</h4>
-        <hr/>
-        <div class="row">
-            <div class="col-md-6">
-                <p><b>Assigned owner:</b>
-                    <span th:text="${project.projectOwner?.getFullName()?:'No one assigned'}">No one assigned </span>
-                    <span th:text="'(' + ${#strings.capitalize(#strings.toLowerCase(project.projectOwner?.role))?:'No role'} + ')'"></span>
-                    <a target="_blank" th:title="'Show details of '+${project.projectOwner?.getFullName()}" th:href="@{'/dashboard/user/detail/'+${project.projectOwner?.id}}">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                    </a>
-                </p>
-                <p><b>Description:</b> <span th:text="${project.description}"></span></p>
-            </div>
-            <div class="col-md-6">
-                <p><b>URL:</b> <span th:text="${project.url}"></span></p>
-                <p><b>Project info:</b> <span th:text="${project.projectInfo}"></span></p>
-            </div>
-        </div>
-        </div>
-
-        <div class="p-2">
-        <h4>Data manipulation</h4>
-        <hr/>
-        <div class="row">
-            <div class="col-md-6">
-                <p><b>Created at:</b> <span th:text="${#dates.format(project.createdAt, 'HH:mm:ss dd.MM.yyyy')}"></span></p>
-                <p><b>Last time edited:</b> <span th:text="${#dates.format(project.lastEditedAt, 'HH:mm:ss dd.MM.yyyy')}"></span></p>
-            </div>
-        </div>
-        </div>
-        <div class="p-2">
-            <h4>Users assigned to project</h4>
-            <hr/>
-            <div class="row">
-                <div class="col-md-12">
-                   <table class="table table-striped table-bordered text-center">
-                       <thead class="thead-dark">
-                       <tr>
-                           <td>First name</td>
-                           <td>Last name</td>
-                           <td>Role name</td>
-                           <td>Email</td>
-                           <td>Show detail</td>
-                       </tr>
-                       </thead>
-                       <tbody>
-                       <tr th:each="user: ${#lists.sort(project.usersOnProject)}">
-                       <td th:text="${user.firstName}"></td>
-                           <td th:text="${user.lastName}"></td>
-                           <td th:text="${#strings.capitalize(#strings.toLowerCase(user.role))}"></td>
-                           <td th:text="${user.email}"></td>
-                           <td><a th:title="'Show details of '+${project.projectOwner?.getFullName()}" target="_blank" th:href="@{'/dashboard/user/detail/'+${user.id}}"><i class="fa-solid fa-magnifying-glass"></i></a></td>
-                       </tr>
-                       </tbody>
-                   </table>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
+
+    <div class="p-2">
+      <h4>Data manipulation</h4>
+      <hr/>
+      <div class="row">
+        <div class="col-md-6">
+          <p><b>Created at:</b> <span th:text="${#dates.format(project.createdAt, 'HH:mm:ss dd.MM.yyyy')}"></span></p>
+          <p><b>Last time edited:</b> <span
+            th:text="${#dates.format(project.lastEditedAt, 'HH:mm:ss dd.MM.yyyy')}"></span></p>
+        </div>
+      </div>
+    </div>
+    <div class="p-2">
+      <h4>Users assigned to project</h4>
+      <hr/>
+      <div class="row">
+        <div class="col-md-12">
+          <table class="table table-striped table-bordered text-center">
+            <thead class="thead-dark">
+            <tr>
+              <td>First name</td>
+              <td>Last name</td>
+              <td>Role name</td>
+              <td>Email</td>
+              <td>Show detail</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="user: ${#lists.sort(project.usersOnProject)}">
+              <td th:text="${user.firstName}"></td>
+              <td th:text="${user.lastName}"></td>
+              <td th:text="${#strings.capitalize(#strings.toLowerCase(user.role))}"></td>
+              <td th:text="${user.email}"></td>
+              <td><a th:title="'Show details of '+${project.projectOwner?.getFullName()}" target="_blank"
+                     th:href="@{'/dashboard/user/detail/'+${user.id}}"><i class="fa-solid fa-magnifying-glass"></i></a>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tasks Section -->
+  <div class="d-flex flex-column">
+    <div class="w-100 d-flex justify-content-between my-2">
+      <h2>Tasks to this project</h2>
+      <button type="button" class="btn btn-md btn-danger" id="modalButton" data-toggle="modal" data-target="#modal">
+        Create new task
+      </button>
+    </div>
+    <div class="d-flex flex-column noUnderline" th:each="task: ${projectTasks}">
+      <a th:href="@{'/dashboard/task/'+${task.id}}" class="my-2">
+          <span class="card p-4">
+            <p class="large text-black card-title"><b th:text="${task.id} + ': ' + ${task.name}"></b></p>
+            <lable class="small"><b>Task description:</b></lable>
+            <span class="innerRichText" th:utext="${task.content}"></span>
+        </span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Modal for creating new task assigned to current project -->
+  <div layout:replace="~{fragments/modal :: modal(title='Create new task')}">
+    <div layout:fragment="modalContent">
+      <p>Hi there! 👋</p>
+      <form th:action="@{/dashboard/project/newTask}" th:object="${newTask}" th:method="POST">
+        <div class="form-group row py-1">
+          <div class="d-flex flex-row">
+            <label class="col-form-label text-start"><b>Task ID:</b></label>
+            <input type="text" th:field="${project.id}" class="form-control" readonly>
+          </div>
+          <label class="col-form-label text-start"><b>Task name:</b></label>
+          <div class="col-sm-12 col-md-6">
+            <div class="input-group">
+              <input type="text" th:field="*{name}" class="form-control" placeholder="Name of the task"
+                     aria-label="name" required minlength="2" maxlength="255">
+            </div>
+          </div>
+          <div class="col-sm-12 mt-5">
+            <div class="form-group">
+              <label for="editor"><b>Task content:</b></label>
+              <textarea type="text" id="editor" rows="4" placeholder="Task description" class="form-control"
+                        aria-label="Task description"
+                        th:field="*{content}" autocomplete="off"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="d-flex justify-content-end py-4">
+          <button type="submit" class="btn btn-md btn-danger">Create task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
 </section>
 </body>
 </html>

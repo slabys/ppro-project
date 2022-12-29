@@ -1,0 +1,16 @@
+<section id="modal" layout:fragment="modal(title)" class="modal fade bd-example-modal-lg" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content p-4">
+      <!-- Modal header -->
+      <div class="modal-header">
+        <h5 class="modal-title" th:text="${title}" layout:fragment="modalHeader">Modal title</h5>
+        <button type="button" id="closeButton" class="btn-close">
+        </button>
+      </div>
+      <!-- Modal body -->
+      <div class="modal-body" layout:fragment="modalContent">
+        Modal content
+      </div>
+    </div>
+  </div>
+</section>

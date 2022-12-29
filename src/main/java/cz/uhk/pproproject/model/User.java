@@ -61,7 +61,6 @@ public class User extends BaseModel implements Comparable<User>{
         this.role = role;
     }
 
-
     @Getter
     @Setter
     @ManyToMany(targetEntity = Project.class, cascade = { CascadeType.ALL },fetch = FetchType.EAGER)
