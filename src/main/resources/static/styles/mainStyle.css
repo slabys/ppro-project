@@ -11,12 +11,12 @@ html, body {
     height: 100%;
 }
 
-button {
+button:not(.btn-close) {
     background: var(--bs-danger);
     color: var(--bs-white);
 }
 
-button:hover {
+button:not(.btn-close):hover {
     background: var(--bs-pink);
     color: var(--bs-white);
     transition: all 300ms;
@@ -40,15 +40,24 @@ table {
 }
 
 .innerRichText {
+    width: 100%;
+    text-align: left;
     max-height: 2.5rem;
-    display: flex;
-}
-.innerRichText > * {
-    font-family: unset;
-    font-style: unset;
-    font-size: unset;
-    line-height: unset;
+    display: inline-block;
+    overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    margin: 0;
+}
+
+.noUnderline a {
+    text-decoration: none;
+    color: black;
+}
+
+.noUnderline a:hover{
+    text-decoration: none;
+}
+
+.noUnderline a:hover > .card-title{
+    text-decoration: underline;
 }

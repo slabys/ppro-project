@@ -3,7 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/layout}">
 <head>
     <meta charset="UTF-8">
-    <title>Employerr - New project</title>
+    <title>New project</title>
 </head>
 <body>
 <section layout:fragment="content" class="container py-4">
@@ -16,8 +16,7 @@
             <div class="alert alert-danger" role="alert" th:text="${error}" th:if="${error}"></div>
 
             <div class="d-flex flex-column justify-content-end">
-                <form th:action="@{/dashboard/project/manage/new}" th:object="${project}" th:method="POST" >
-
+                <form th:action="@{/dashboard/project/manage/new}" th:object="${project}" th:method="POST">
                     <div class="form-group row py-1">
                             <h4>Basic project information</h4>
                             <hr/>

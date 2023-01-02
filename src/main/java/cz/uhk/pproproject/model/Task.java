@@ -19,6 +19,9 @@ public class Task extends BaseModel{
     @Getter @Setter @Column(columnDefinition = "RICH_TEXT", length=65555)
     private String content;
 
+    @Getter @Setter @Column
+    private Long assignedToProject;
+
     @Getter @Setter
     @OneToMany(targetEntity = Comment.class)
     @JoinTable(name = "task_comments",

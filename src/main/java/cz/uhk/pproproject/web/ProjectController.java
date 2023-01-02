@@ -2,8 +2,10 @@ package cz.uhk.pproproject.web;
 
 import cz.uhk.pproproject.middleware.CustomUserDetails;
 import cz.uhk.pproproject.model.Project;
+import cz.uhk.pproproject.model.Task;
 import cz.uhk.pproproject.model.User;
 import cz.uhk.pproproject.repository.ProjectRepository;
+import cz.uhk.pproproject.repository.TaskRepository;
 import cz.uhk.pproproject.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.*;
@@ -27,12 +30,19 @@ public class ProjectController {
     private ProjectRepository projectRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private TaskRepository taskRepository;
 
     @GetMapping("/dashboard/project/manage/new")
     @PreAuthorize("hasRole('ROLE_OWNER')")
     public String showProjectForm(Model m, Project project) {
         m.addAttribute("project", new Project());
         return "forms/project/projectForm";
+    }
+
+    @GetMapping("/dashboard/project/manage/{id}/createTask")
+    public String modal(@PathVariable long id) {
+        return "fragments/modal/createTask";
     }
 
     @PostMapping("/dashboard/project/manage/new")
@@ -47,6 +57,16 @@ public class ProjectController {
         userRepository.save(user);
 
         redirectAttrs.addFlashAttribute("info", "Project successfully created");
+        return "redirect:/dashboard/project/list";
+    }
+
+    @PostMapping("/dashboard/project/newTask")
+    public String addTaskToProject(Project project, Task task, Authentication auth, RedirectAttributes redirectAttrs) {
+        User user = ((CustomUserDetails) auth.getPrincipal()).getUser();
+        task.setAssignedToProject(project.getId());
+        task.setCreatedBy(user);
+        taskRepository.save(task);
+        redirectAttrs.addFlashAttribute("info", "Task successfully created and assigned to project.");
         return "redirect:/dashboard/project/list";
     }
 
@@ -128,6 +148,7 @@ public class ProjectController {
     @GetMapping("/dashboard/project/detail/{id}")
     public String showProjectDetail(Model m, Authentication auth, @PathVariable long id, RedirectAttributes redirectAttrs) {
         Optional<Project> project = projectRepository.findById(id);
+        List<Task> projectTasks = taskRepository.findAllTaskByAssignedProjectId(id);
         if (project.isEmpty()) {
             redirectAttrs.addFlashAttribute("error", "Project does not exists");
             throw new ResponseStatusException(NOT_FOUND, "Project detail does not exists");
@@ -140,7 +161,12 @@ public class ProjectController {
             return "redirect:/dashboard/project/list";
         }
 
+        for(Task task : projectTasks ) {
+            task.setContent(task.getContent().replaceAll("\\<[^>]*>",""));
+        }
         m.addAttribute("project", project.get());
+        m.addAttribute("projectTasks", projectTasks);
+        m.addAttribute("newTask", new Task());
         return "project/projectDetail";
     }
 

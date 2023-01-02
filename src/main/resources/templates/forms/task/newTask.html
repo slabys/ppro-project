@@ -3,17 +3,15 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/layout}">
 <head>
   <meta charset="UTF-8">
-  <title>Employerr - New task</title>
+  <title>New task</title>
 </head>
 <body>
 <section layout:fragment="content" class="container py-4">
-
   <div class="d-flex flex-column shadow gap-4">
     <div class="card p-4">
       <h2><i class="bi bi-card-text pe-4"></i>Task form</h2>
       <div class="d-flex flex-column justify-content-end">
         <form th:action="@{/dashboard/task/new}" th:object="${task}" th:method="POST">
-
           <div class="form-group row py-1">
             <h4>Basic task information</h4>
             <hr/>
@@ -40,32 +38,18 @@
       </div>
     </div>
   </div>
-  <script src="https://cdn.ckeditor.com/ckeditor5/35.4.0/super-build/ckeditor.js"></script>
   <script>
       ClassicEditor.create(document.getElementById("editor"), {
           toolbar: {
               items: [
                   'heading', '|',
-                  'bold', 'italic', 'strikethrough', 'underline', 'code', 'subscript', 'superscript', 'removeFormat', '|',
-                  'bulletedList', 'numberedList', 'todoList', '|',
+                  'bold', 'italic', 'bulletedList', 'numberedList', '|',
                   'outdent', 'indent', '|',
+                  'link', 'blockQuote', '|',
                   'undo', 'redo',
                   '-',
-                  'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', 'highlight', '|',
                   'alignment', '|',
-                  'link', 'blockQuote', '|',
-                  'specialCharacters', 'horizontalLine', 'pageBreak', '|',
-                  'textPartLanguage', '|',
-                  'sourceEditing'
               ],
-              shouldNotGroupWhenFull: false
-          },
-          list: {
-              properties: {
-                  styles: true,
-                  startIndex: true,
-                  reversed: true
-              }
           },
           heading: {
               options: [

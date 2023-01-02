@@ -32,6 +32,9 @@ public class TaskController {
     @GetMapping("/dashboard/tasks")
     public String showAllTasks(Model m) {
         List<Task> taskList = taskRepository.findAll();
+        for (Task task : taskList) {
+            task.setContent(task.getContent().replaceAll("\\<[^>]*>",""));
+        }
         m.addAttribute("taskList", taskList);
         return "task/taskList";
     }
