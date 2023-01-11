@@ -20,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -61,13 +62,18 @@ public class ProjectController {
     }
 
     @PostMapping("/dashboard/project/newTask")
-    public String addTaskToProject(Project project, Task task, Authentication auth, RedirectAttributes redirectAttrs) {
+    public String addTaskToProject(HttpServletRequest request,Project project, Task newTask, Authentication auth, RedirectAttributes redirectAttrs) {
         User user = ((CustomUserDetails) auth.getPrincipal()).getUser();
-        task.setAssignedToProject(project.getId());
-        task.setCreatedBy(user);
-        taskRepository.save(task);
+        newTask.setAssignedToProject(project.getId());
+        newTask.setCreatedBy(user);
+        taskRepository.save(newTask);
         redirectAttrs.addFlashAttribute("info", "Task successfully created and assigned to project.");
-        return "redirect:/dashboard/project/list";
+
+        if(request.getHeader("Referer").isEmpty()){
+            return "redirect:/dashboard/project/list";
+        }else{
+            return "redirect:" + request.getHeader("Referer");
+        }
     }
 
     @GetMapping("/dashboard/project/manage/setOwner/{id}")
@@ -149,6 +155,7 @@ public class ProjectController {
     public String showProjectDetail(Model m, Authentication auth, @PathVariable long id, RedirectAttributes redirectAttrs) {
         Optional<Project> project = projectRepository.findById(id);
         List<Task> projectTasks = taskRepository.findAllTaskByAssignedProjectId(id);
+        List<Task> finishedTasks = taskRepository.findAllFinishedTasksByAssignedProjectId(id);
         if (project.isEmpty()) {
             redirectAttrs.addFlashAttribute("error", "Project does not exists");
             throw new ResponseStatusException(NOT_FOUND, "Project detail does not exists");
@@ -162,10 +169,14 @@ public class ProjectController {
         }
 
         for(Task task : projectTasks ) {
-            task.setContent(task.getContent().replaceAll("\\<[^>]*>",""));
+            task.setContent(task.getContent().replaceAll("\\<[^>]*>"," "));
+        }
+        for(Task task : finishedTasks){
+            task.setContent(task.getContent().replaceAll("\\<[^>]*>"," "));
         }
         m.addAttribute("project", project.get());
         m.addAttribute("projectTasks", projectTasks);
+        m.addAttribute("finishedTasks", finishedTasks);
         m.addAttribute("newTask", new Task());
         return "project/projectDetail";
     }

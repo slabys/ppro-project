@@ -5,7 +5,7 @@
     <title>Employerr - User list</title>
 </head>
 <body>
-<section layout:fragment="content">
+<section layout:fragment="content" class="container py-4">
     <div class="p-3" th:if="${!listUsers.isEmpty()}">
         <div>
             <h2>List of users</h2>
@@ -13,35 +13,31 @@
             <hr>
         </div>
         <div>
-        <table id="userTable" class="table table-striped text-center table-bordered">
+        <table id="datatable" class="table table-striped text-center table-bordered">
             <thead class="thead-dark">
             <tr>
-                <th>User ID</th>
                 <th>Company E-mail</th>
                 <th>First Name</th>
                 <th>Last Name</th>
                 <th>Role</th>
                 <th>Active</th>
+                <th>User detail</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="user: ${listUsers}">
-                <td th:text="${user.id}">User ID</td>
                 <td th:text="${user.email}">E-mail</td>
                 <td th:text="${user.firstName}">First Name</td>
                 <td th:text="${user.lastName}">Last Name</td>
                 <td th:text="${#strings.capitalize(#strings.toLowerCase(user.role))}">Role</td>
                 <td th:if="${user.active}"><i style="color:darkgreen"  class="fa-solid fa-circle-check"></i></td>
                 <td th:if="${!user.active}"><i style="color:darkred" class="fa-solid fa-circle-xmark"></i></td>
+                <td><a th:title="'Show details of '+${user.getFullName()}" target="_blank"
+                       th:href="@{'/dashboard/user/detail/'+${user.id}}"><i class="fa-solid fa-magnifying-glass"></i></a></td>
             </tr>
             </tbody>
         </table>
         </div>
-        <script>
-            $(document).ready( function () {
-                $('#userTable').DataTable();
-            } );
-        </script>
     </div>
     <div class="p-3" th:if="${listUsers.isEmpty()}">
         <div>

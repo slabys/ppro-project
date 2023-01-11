@@ -10,8 +10,9 @@
   <div class="p-3" th:if="${!taskList.isEmpty()}">
     <div>
       <h1>List of tasks</h1>
+      <hr>
     </div>
-    <table class="table table-striped table-bordered text-center">
+    <table id="datatable" class="table table-striped table-bordered text-center">
       <div class="d-flex py-2 justify-content-end">
         <a th:href="@{/dashboard/task/new}">
           <button class="btn btn-danger btn-md">Create new task</button>
@@ -22,16 +23,15 @@
         <th>Project ID</th>
         <th>Project name</th>
         <th>Content</th>
-        <th>Link</th>
+        <th style="width: 50px">Link</th>
       </tr>
       </thead>
       <tbody>
       <tr th:each="task: ${taskList}">
         <td th:text="${task.id}">Project ID</td>
         <td th:text="${task.name}">Project name</td>
-        <td th:utext="${task.content}" class="innerRichText">Project content</td>
-        <td>
-          <a th:href="@{'/dashboard/task/' + ${task.id}}">Link</a></td>
+        <td th:utext="${#strings.abbreviate(task.content,30)}" class="innerRichText">Project content</td>
+        <td><a th:href="@{'/dashboard/task/' + ${task.id}}"><i class="fa-solid fa-magnifying-glass"></i></a></td>
       </tr>
       </tbody>
     </table>

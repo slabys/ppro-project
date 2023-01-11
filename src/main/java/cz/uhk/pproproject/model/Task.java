@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -21,6 +22,15 @@ public class Task extends BaseModel{
 
     @Getter @Setter @Column
     private Long assignedToProject;
+
+    @Getter @Setter @Column(columnDefinition = "default false")
+    private boolean completed;
+
+    @Getter @Setter @OneToOne(targetEntity = User.class, optional = true)
+    private User completedBy;
+
+    @Getter @Setter @Column(nullable = true)
+    private Date completedAt;
 
     @Getter @Setter
     @OneToMany(targetEntity = Comment.class)
