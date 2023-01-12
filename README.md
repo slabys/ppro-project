@@ -1,6 +1,4 @@
 # ppro-project
-Breadcrumbs? 
-https://github.com/pawanspace/BreadCrumb-Spring-MVC
 
 Create image of MariaDb in Docker
 ```
