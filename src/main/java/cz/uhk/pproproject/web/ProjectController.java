@@ -64,7 +64,7 @@ public class ProjectController {
     @PostMapping("/dashboard/project/newTask")
     public String addTaskToProject(HttpServletRequest request,Project project, Task newTask, Authentication auth, RedirectAttributes redirectAttrs) {
         User user = ((CustomUserDetails) auth.getPrincipal()).getUser();
-        newTask.setAssignedToProject(project.getId());
+        newTask.setAssignedToProject(project);
         newTask.setCreatedBy(user);
         taskRepository.save(newTask);
         redirectAttrs.addFlashAttribute("info", "Task successfully created and assigned to project.");
@@ -154,12 +154,13 @@ public class ProjectController {
     @GetMapping("/dashboard/project/detail/{id}")
     public String showProjectDetail(Model m, Authentication auth, @PathVariable long id, RedirectAttributes redirectAttrs) {
         Optional<Project> project = projectRepository.findById(id);
-        List<Task> projectTasks = taskRepository.findAllTaskByAssignedProjectId(id);
-        List<Task> finishedTasks = taskRepository.findAllFinishedTasksByAssignedProjectId(id);
         if (project.isEmpty()) {
             redirectAttrs.addFlashAttribute("error", "Project does not exists");
             throw new ResponseStatusException(NOT_FOUND, "Project detail does not exists");
         }
+        List<Task> projectTasks = taskRepository.findAllTaskByAssignedProject(project.get());
+        List<Task> finishedTasks = taskRepository.findAllFinishedTasksByAssignedProject(project.get());
+
         CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
         User user = userDetails.getUser();
 

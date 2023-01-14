@@ -31,7 +31,7 @@
         <td th:text="${task.id}">Project ID</td>
         <td th:text="${task.name}">Project name</td>
         <td th:utext="${#strings.abbreviate(task.content,30)}" class="innerRichText">Project content</td>
-        <td><a th:href="@{'/dashboard/task/' + ${task.id}}"><i class="fa-solid fa-magnifying-glass"></i></a></td>
+        <td><a th:href="@{'/dashboard/task/detail/' + ${task.id}}"><i class="fa-solid fa-magnifying-glass"></i></a></td>
       </tr>
       </tbody>
     </table>

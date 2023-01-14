@@ -20,8 +20,8 @@ public class Task extends BaseModel{
     @Getter @Setter @Column(columnDefinition = "RICH_TEXT", length=65555)
     private String content;
 
-    @Getter @Setter @Column
-    private Long assignedToProject;
+    @Getter @Setter @OneToOne(targetEntity = Project.class, optional = true)
+    private Project assignedToProject;
 
     @Getter @Setter @Column(columnDefinition = "default false")
     private boolean completed;

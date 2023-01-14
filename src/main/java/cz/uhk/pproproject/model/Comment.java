@@ -12,7 +12,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 public class Comment extends BaseModel {
     @OneToOne(targetEntity = User.class) @Getter @Setter
-    private User createBy;
+    private User createdBy;
 
     @Column() @ColumnDefault("false") @Getter @Setter
     private boolean deleted;
