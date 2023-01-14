@@ -3,15 +3,16 @@ package cz.uhk.pproproject.model;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
 
 
-@NoArgsConstructor
 @Entity
 @Table(name="task")
+@NoArgsConstructor
 public class Task extends BaseModel{
     @Getter @Setter @OneToOne(targetEntity = User.class)
     private User createdBy;
@@ -19,13 +20,13 @@ public class Task extends BaseModel{
     @Column @Getter @Setter
     private String name;
 
-    @Getter @Setter @Column(columnDefinition = "RICH_TEXT", length=65555)
+    @Getter @Setter @Column(length=65555)
     private String content;
 
     @Getter @Setter @OneToOne(targetEntity = Project.class, optional = true)
     private Project assignedToProject;
 
-    @Getter @Setter @Column(columnDefinition = "default false")
+    @Getter @Setter @Column() @ColumnDefault("false")
     private boolean completed;
 
     @Getter @Setter @OneToOne(targetEntity = User.class, optional = true)
