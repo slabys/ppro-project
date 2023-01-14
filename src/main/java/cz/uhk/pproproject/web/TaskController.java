@@ -75,7 +75,7 @@ public class TaskController {
                 thisMonthTime.add(taskTime);
             }
             Duration dur = Duration.between(taskTime.getStartTime(), taskTime.getEndTime());
-            hoursWorked += dur.toHours();
+            hoursWorked += dur.toHours() + ((float)dur.toMinutesPart()/60);
         }
         hoursWorked = Float.parseFloat(df.format(hoursWorked));
 
@@ -134,6 +134,18 @@ public class TaskController {
     public String addTimeToTask(HttpServletRequest request, TaskTime taskTime, RedirectAttributes redirectAttributes, String startTimeString, String endTimeString){
         taskTime.setStartTime(LocalDateTime.parse(startTimeString));
         taskTime.setEndTime(LocalDateTime.parse(endTimeString));
+        Duration dur = Duration.between(taskTime.getStartTime(), taskTime.getEndTime());
+        System.out.println(dur.toHours());
+        if((dur.toMinutesPart() < 0) || dur.toHours() < 0 || dur.toSecondsPart() < 0){
+            redirectAttributes.addFlashAttribute("error", "Time cannot be negative");
+
+            if(request.getHeader("Referer").isEmpty()){
+                return "redirect:/dashboard/project/list/user";
+            }else{
+                return "redirect:" + request.getHeader("Referer");
+            }
+        }
+
         taskTimeRepository.save(taskTime);
         redirectAttributes.addFlashAttribute("info", "Time on task successfully added.");
 
