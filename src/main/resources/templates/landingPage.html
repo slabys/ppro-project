@@ -103,6 +103,37 @@
     </div>
   </div>
 
+  <div class="my-5">
+  <h3><i class="fa-solid fa-list"></i> Usage statistics</h3>
+    <hr/>
+  <div class="d-flex flex-wrap" th:if="${stats != null}">
+
+    <div class="shadow p-3 m-2 rounded-2 col-sm-5">
+      <h5><i class="fa-solid fa-users rounded-3 p-1" style="background-color:lightpink" ></i> User statistics</h5>
+      <hr />
+      <p><i class="fa-solid fa-user-check"></i> Activated accounts: <b th:text="${#numbers.formatInteger(stats.numOfUsers,0,'WHITESPACE')}"></b></p>
+      <p><i class="fa-solid fa-user-cog"></i> Managers: <b th:text="${#numbers.formatInteger(stats.numOfManagers,0,'WHITESPACE')}"></b></p>
+      <p><i class="fa-solid fa-user-group"></i> Basic employees: <b th:text="${#numbers.formatInteger(stats.numOfEmployees,0,'WHITESPACE')}"></b></p>
+      <p><i class="fa-solid fa-circle-dollar-to-slot"></i> Total employee costs: <b th:text="${#numbers.formatDecimal(stats.sumOfSalary,0,'WHITESPACE',2,'POINT')}"></b>$ per hour</p>
+      <p><i class="fa-solid fa-sack-dollar"></i> Average salary: <b th:text="${#numbers.formatDecimal(stats.averageSalary,0,'WHITESPACE',2,'POINT')}"></b>$</p>
+    </div>
+    <div class="shadow p-3 m-2 rounded-2 col-sm-3">
+      <h5><i class="fa-solid fa-file rounded-3 p-1" style="background-color:lightpink" ></i> Project statistics</h5>
+      <hr />
+      <p><i class="fa-solid fa-file-text"></i> Number of projects: <b th:text="${#numbers.formatInteger(stats.numOfProjects,0,'WHITESPACE')}"></b></p>
+      <p><i class="fa-solid fa-person-circle-xmark"></i> Projects without leaders: <b th:text="${#numbers.formatInteger(stats.numOfProjectsWithoutOwner,0,'WHITESPACE')}"></b></p>
+      <p><i class="fa-solid fa-user-group"></i> Average assigned to project: <b th:text="${#numbers.formatDecimal(stats.averageUsersOnProject,0,'WHITESPACE',0,'NONE')}"></b></p>
+    </div>
+    <div class="shadow p-3 m-2 rounded-2 col-sm-3">
+      <h5><i class="fa-solid fa-tasks rounded-3 p-1" style="background-color:lightpink" ></i> Tasks statistics</h5>
+      <hr />
+      <p><i class="fa-solid fa-tasks-alt"></i> All tasks: <b th:text="${#numbers.formatInteger(stats.numOfTasks,0,'WHITESPACE')}"></b></p>
+      <p><i class="fa-solid fa-circle-xmark"></i> Not finished tasks: <b th:text="${#numbers.formatInteger(stats.numOfNonFinishedTasks,0,'WHITESPACE')}"></b></p>
+      <p><i class="fa-solid fa-circle-check"></i> Finished tasks: <b th:text="${#numbers.formatInteger(stats.numOfFinishedTasks,0,'WHITESPACE')}"></b></p>
+    </div>
+  </div>
+  </div>
+
 </section>
 </body>
 </html>

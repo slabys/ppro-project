@@ -25,8 +25,6 @@
                 </p>
             </div>
             <hr/>
-            <div class="alert alert-primary" role="alert" th:text="${info}" th:if="${info}"></div>
-            <div class="alert alert-danger" role="alert" th:text="${error}" th:if="${error}"></div>
             <form th:action="${addPeople} ? @{/dashboard/project/manage/addPeople} : @{/dashboard/project/manage/removePeople}" th:method="POST" >
                 <input type="hidden" name="id" th:value="${project.id}">
                 <div th:if="${higherRoles.size == 0 && managers.size == 0 && employees.size == 0}">

@@ -17,4 +17,10 @@ public interface TaskRepository extends JpaRepository<Task,Long> {
 
     @Query("SELECT u FROM Task u WHERE u.assignedToProject = ?1 and u.completed=true")
     public List<Task> findAllFinishedTasksByAssignedProject(Project id);
+
+    @Query("SELECT count(u) FROM Task u WHERE u.completed=false")
+    public long countAllNoncompletedTasks();
+
+    @Query("SELECT count(u) FROM Task u WHERE u.completed=true")
+    public long countAllFinishedTasksByAssignedProject();
 }
