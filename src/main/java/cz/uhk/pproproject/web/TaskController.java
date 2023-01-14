@@ -56,13 +56,17 @@ public class TaskController {
     }
 
     @GetMapping("/dashboard/task/detail/{id}")
-    public String showAllTasks(Authentication auth, Model m, @PathVariable long id, RedirectAttributes redirectAttrs) {
+    public String showTaskDetail(Authentication auth, Model m, @PathVariable long id, RedirectAttributes redirectAttrs) {
         CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
         User loggedUser = userDetails.getUser();
         Optional<Task> task = taskRepository.findById(id);
         if (task.isEmpty()) {
             redirectAttrs.addFlashAttribute("error", "Project does not exist");
             throw new ResponseStatusException(NOT_FOUND, "Unable to find project");
+        }
+        if(!loggedUser.hasAccessToProject(task.get().getAssignedToProject())){
+            redirectAttrs.addFlashAttribute("info", "You don't have permissions to view this task");
+            return "redirect:/";
         }
         List<Comment> comments = task.get().getTaskComments();
         Collections.reverse(comments);
@@ -109,7 +113,6 @@ public class TaskController {
     @PostMapping("/dashboard/task/newComment")
     public String addComment(Comment comment,Long task,RedirectAttributes redirectAttributes, Authentication auth, HttpServletRequest request){
         User user = ((CustomUserDetails) auth.getPrincipal()).getUser();
-
         Optional<Task> lookupTask = taskRepository.findById(task);
         if(lookupTask.isEmpty()){
             redirectAttributes.addFlashAttribute("info", "Error occurred, task not found");
@@ -118,6 +121,10 @@ public class TaskController {
             }else{
                 return "redirect:" + request.getHeader("Referer");
             }
+        }
+        if(!user.hasAccessToProject(lookupTask.get().getAssignedToProject())){
+            redirectAttributes.addFlashAttribute("info", "You don't have permissions to comment this task");
+            return "redirect:/";
         }
         comment.setCreatedBy(user);
         commentRepository.save(comment);
@@ -132,11 +139,16 @@ public class TaskController {
     }
 
     @PostMapping("/dashboard/task/addTime")
-    public String addTimeToTask(HttpServletRequest request, TaskTime taskTime, RedirectAttributes redirectAttributes, String startTimeString, String endTimeString){
+    public String addTimeToTask(Authentication auth,HttpServletRequest request, TaskTime taskTime, RedirectAttributes redirectAttributes, String startTimeString, String endTimeString){
+        User user = ((CustomUserDetails) auth.getPrincipal()).getUser();
+        if(!user.hasAccessToProject(taskTime.getTask().getAssignedToProject())){
+            redirectAttributes.addFlashAttribute("info", "You don't have permissions to add time to this task");
+            return "redirect:/";
+        }
         taskTime.setStartTime(LocalDateTime.parse(startTimeString));
         taskTime.setEndTime(LocalDateTime.parse(endTimeString));
         Duration dur = Duration.between(taskTime.getStartTime(), taskTime.getEndTime());
-        System.out.println(dur.toHours());
+
         if((dur.toMinutesPart() < 0) || dur.toHours() < 0 || dur.toSecondsPart() < 0){
             redirectAttributes.addFlashAttribute("error", "Time cannot be negative");
 
@@ -155,5 +167,22 @@ public class TaskController {
         }else{
             return "redirect:" + request.getHeader("Referer");
         }
+    }
+
+    @PostMapping("/dashboard/task/finish/{id}")
+    public String finishTask(HttpServletRequest request, @PathVariable long id,Task task, RedirectAttributes redirectAttributes, Authentication auth){
+        User user = ((CustomUserDetails) auth.getPrincipal()).getUser();
+        if(!user.hasAccessToProject(task.getAssignedToProject())){
+            redirectAttributes.addFlashAttribute("info", "You don't have permissions to finish this task");
+            return "redirect:/";
+        }
+        task.setCompleted(true);
+        task.setCompletedAt(new Date());
+        task.setCompletedBy(user);
+
+        taskRepository.save(task);
+        redirectAttributes.addFlashAttribute("info", "Task marked as finished successfully");
+
+        return "redirect:/dashboard/project/detail/"+task.getAssignedToProject().getId();
     }
 }
