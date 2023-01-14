@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
@@ -62,9 +61,18 @@ public class ProjectController {
     }
 
     @PostMapping("/dashboard/project/newTask")
-    public String addTaskToProject(HttpServletRequest request,Project project, Task newTask, Authentication auth, RedirectAttributes redirectAttrs) {
+    public String addTaskToProject(HttpServletRequest request,long projectId, Task newTask, Authentication auth, RedirectAttributes redirectAttrs) {
+        Optional<Project> project = projectRepository.findById(projectId);
+        if(project.isEmpty()){
+            redirectAttrs.addFlashAttribute("error", "Project does not exists");
+            if(request.getHeader("Referer").isEmpty()){
+                return "redirect:/dashboard/project/list";
+            }else{
+                return "redirect:" + request.getHeader("Referer");
+            }
+        }
         User user = ((CustomUserDetails) auth.getPrincipal()).getUser();
-        newTask.setAssignedToProject(project);
+        newTask.setAssignedToProject(project.get());
         newTask.setCreatedBy(user);
         taskRepository.save(newTask);
         redirectAttrs.addFlashAttribute("info", "Task successfully created and assigned to project.");
