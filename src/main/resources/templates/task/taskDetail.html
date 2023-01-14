@@ -122,8 +122,9 @@
           <label class="col-form-label text-start"><b>Comment:</b></label>
           <div class="col-sm-12 col-md-6">
             <div class="input-group">
-              <input type="text" th:field="*{content}" class="form-control" placeholder="Add your comment here"
-                     aria-label="name" required minlength="2" maxlength="255">
+              <textarea type="text" id="editor" rows="4" placeholder="Add your comment here" class="form-control"
+                        aria-label="Add your comment here"
+                        th:field="*{content}" autocomplete="off"></textarea>
             </div>
           </div>
         </div>

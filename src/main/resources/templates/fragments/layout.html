@@ -154,9 +154,27 @@
     });
 </script>
 <script>
-  $(document).ready( function () {
-    $('#datatable').DataTable();
-  });
+    $(document).ready(function () {
+        $('#datatable').DataTable({
+            responsive: {
+                breakpoints: [
+                    {name: 'bigdesktop', width: Infinity},
+                    {name: 'meddesktop', width: 1480},
+                    {name: 'smalldesktop', width: 1280},
+                    {name: 'medium', width: 1188},
+                    {name: 'tabletl', width: 1024},
+                    {name: 'btwtabllandp', width: 848},
+                    {name: 'tabletp', width: 768},
+                    {name: 'mobilel', width: 480},
+                    {name: 'mobilep', width: 320}
+                ]
+            },
+            "scrollX": true
+        });
+        $('table.table').css('width', '100%');
+        $('div.dataTables_scrollHeadInner').css('width', '100%');
+        $('div.dataTables_scroll').css('width', '100%');
+    });
 </script>
 </body>
 </html>
