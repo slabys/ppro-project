@@ -53,8 +53,60 @@
         </div>
       </div>
 
+      <div class="py-4" th:object="${contact}">
+        <div class="row justify-content-center">
+          <h4><i class="fa-solid fa-address-card"></i> Contact information (not required but advised)</h4>
+          <div>
+            <div>
+            <div class="form-group row p-2">
+              <label class="col-4 col-form-label"><i class="fa-solid fa-street-view"></i> Street: </label>
+              <div class="col-8">
+                <input type="text" th:field="*{street}" class="form-control"/>
+              </div>
+            </div>
+
+            <div class="form-group row p-2">
+              <label class="col-4 col-form-label"><i class="fa-solid fa-building"></i> City: </label>
+              <div class="col-8">
+                <input type="text" th:field="*{city}" class="form-control"/>
+              </div>
+            </div>
+            </div>
+            <div class="form-group row p-2">
+              <label class="col-4 col-form-label"><i class="fa-solid fa-globe"></i> State: </label>
+              <div class="col-8">
+                <input name="state" type="text" th:field="*{state}" class="form-control"/>
+              </div>
+            </div>
+
+            <div class="form-group row p-2">
+              <label class="col-4 col-form-label"><i class="fa-solid fa-hashtag"></i> Zip code: </label>
+              <div class="col-8">
+                <input type="text" th:field="*{zipCode}" class="form-control"/>
+              </div>
+            </div>
+          </div>
+          <div class="">
+            <div class="form-group row p-2">
+              <label class="col-4 col-form-label"><i class="fa-solid fa-phone"></i> Phone: </label>
+              <div class="col-8">
+                <input type="tel" th:field="*{phone}" class="form-control"/>
+              </div>
+            </div>
+            <div class="form-group row p-2">
+              <label class="col-4 col-form-label"><i class="fa-solid fa-building-columns"></i> Bank
+                account: </label>
+              <div class="col-8">
+                <input type="text" th:field="*{bankAccount}" class="form-control"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="p-2">
-        <button type="submit" id="submitButton" class="btn btn-primary" disabled>Sign Up</button>
+        <button type="submit" id="submitButton" class="btn btn-danger" disabled>Sign Up</button>
         <p class="text-danger" id="passwordError"></p>
       </div>
     </div>

@@ -71,6 +71,7 @@ public class UserController {
             m.addAttribute("user", user.get());
             m.addAttribute("repeatPassword", this.repeatPassword);
             m.addAttribute("uat", uat);
+            m.addAttribute("contact",new Contact());
             return "forms/user/activateAccount";
         }
         return "redirect:/";
@@ -78,7 +79,7 @@ public class UserController {
 
     @PostMapping("/activateUser")
     @Transactional
-    public String activateUserPost(Model m, User user, RedirectAttributes redirectAttrs) throws IOException {
+    public String activateUserPost(Model m, User user,Contact contact, RedirectAttributes redirectAttrs) throws IOException {
         User updateUser = userRepo.findByEmail(user.getEmail());
         updateUser.setActive(true);
 
@@ -88,7 +89,8 @@ public class UserController {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         updateUser.setPassword(encodedPassword);
-
+        contactRepository.save(contact);
+        updateUser.setContact(contact);
         userRepo.save(updateUser);
         uatRepo.save(uat);
 
@@ -215,7 +217,10 @@ public class UserController {
     @PreAuthorize("hasRole('ROLE_OWNER')")
     public String showPrivilegedUserEditForm(Model m, Authentication auth, @PathVariable long id) {
         Optional<User> user = userRepo.findById(id);
-
+        if(user.isEmpty()){
+            m.addAttribute("error","User not found");
+            throw new ResponseStatusException(NOT_FOUND, "Unable to find user");
+        }
         user.ifPresent(value -> {
             m.addAttribute("user", value);
             if (user.get().getContact() == null) {

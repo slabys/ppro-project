@@ -22,6 +22,7 @@
                 <th>Role</th>
                 <th>Active</th>
                 <th>User detail</th>
+                <th>Edit</th>
             </tr>
             </thead>
             <tbody>
@@ -34,6 +35,8 @@
                 <td th:if="${!user.active}"><i style="color:darkred" class="fa-solid fa-circle-xmark"></i></td>
                 <td><a th:title="'Show details of '+${user.getFullName()}" target="_blank"
                        th:href="@{'/dashboard/user/detail/'+${user.id}}"><i class="fa-solid fa-magnifying-glass"></i></a></td>
+                <td><a th:title="'Edit details of '+${user.getFullName()}"
+                                                             th:href="@{'/dashboard/user/edit/'+${user.id}}"><i class="fa-solid fa-edit"></i></a></td>
             </tr>
             </tbody>
         </table>
@@ -41,7 +44,7 @@
     </div>
     <div class="p-3" th:if="${listUsers.isEmpty()}">
         <div>
-            <h4>User list is empty! </h4>
+            <h4>How can you see this page?! List is empty!</h4>
         </div>
     </div>
 </section>

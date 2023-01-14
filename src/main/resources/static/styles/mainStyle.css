@@ -2,6 +2,7 @@
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css');
 @import url('https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css');
 @import url('https://cdn.datatables.net/1.13.1/css/dataTables.bootstrap5.min.css');
+@import url('https://cdn.datatables.net/responsive/2.4.0/css/responsive.dataTables.min.css');
 @import url('./linkStyles.css');
 
 
@@ -9,6 +10,10 @@ html, body {
     margin: 0;
     padding: 0;
     height: 100%;
+}
+table{
+    width: 100%;
+    overflow-x: scroll;
 }
 
 button:not(.btn-close) {
@@ -60,4 +65,8 @@ table {
 
 .noUnderline a:hover > .card-title{
     text-decoration: underline;
+}
+
+.fa-solid{
+    color: var(--bs-red);
 }
