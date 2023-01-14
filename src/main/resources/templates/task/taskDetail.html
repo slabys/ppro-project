@@ -9,21 +9,37 @@
 <section layout:fragment="content" class="container py-4">
   <div class="d-flex flex-column">
     <div class="d-flex justify-content-between">
-      <label>ID: Task name</label>
-      <label>Created by:</label>
+      <label>ID: Name</label>
+      <label th:if="${task.completed == false}"><i class="fa-solid fa-user"></i> Created by:</label>
+      <label th:if="${task.completed == true}"><i class="fa-solid fa-user"></i> Completed by:</label>
     </div>
     <div class="d-flex justify-content-between">
       <h2 class="m-0" th:text="${task.id} +': ' + ${task.name}">ID: name</h2>
-      <p class="d-flex justify-content-end flex-column text-end m-0">
+      <p th:if="${task.completed == false}" class="d-flex justify-content-end flex-column text-end m-0">
         <b th:text="${task.createdBy.fullName}">Creator</b>
         <span th:text="${#dates.format(task.createdAt, 'dd.MM.yyyy')}"></span>
+      </p>
+      <p th:if="${task.completed == true}" class="d-flex justify-content-end flex-column text-end m-0">
+        <b th:text="${task.completedBy.fullName}">Creator</b>
+        <span th:text="${#dates.format(task.completedAt, 'dd.MM.yyyy')}"></span>
       </p>
     </div>
   </div>
   <hr/>
   <div class="container">
-    <h4>Description:</h4>
-    <div class="card p-4">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h4><i class="fa-solid fa-tasks"></i> Description:</h4>
+      </div>
+      <form th:if="${task.completed == false}" th:action="@{'/dashboard/task/finish/'+${task.id}}" th:method="POST">
+        <div>
+          <input th:value="${task.id}" type="hidden" name="task"/>
+          <button class="btn" type="submit">Mark as finished <i class="fa-solid fa-circle-check" style="color:white"></i> </button>
+        </div>
+      </form>
+
+    </div>
+    <div class="card my-1 p-4">
       <div class="row">
         <div class="col-md-12" th:utext="${task.content}">
         </div>
@@ -31,7 +47,7 @@
     </div>
   </div>
   <div class="container py-5">
-    <h4>Work time</h4>
+    <h4><i class="fa-solid fa-clock"></i> Work time</h4>
     <hr/>
     <form class="py-1" th:action="@{/dashboard/task/addTime}" th:object="${newTaskTime}" th:method="POST">
       <input type="hidden" th:value="${task.id}" name="task">
@@ -39,12 +55,12 @@
       <input type="hidden" th:value="${user.id}" name="user">
       <div class="row">
         <div class="col col-sm-12 col-md-5">
-          <label class="col-form-label text-start"><b>Work started at:</b></label>
+          <label class="col-form-label text-start"><i class="fa-solid fa-circle-check"></i> <b>Work started at:</b></label>
           <input class="form-control w-75" type="datetime-local" id="startTime"
                  name="startTimeString" step="1">
         </div>
         <div class="col col-12 col-md-5">
-          <label class="col-form-label text-start"><b>Work ended at:</b></label>
+          <label class="col-form-label text-start"><i class="fa-solid fa-calendar-xmark"></i> <b>Work ended at:</b></label>
           <input class="form-control w-75" type="datetime-local" id="endTime"
                  name="endTimeString" step="1">
         </div>
@@ -89,8 +105,8 @@
         <tbody>
         <tr th:each="timestamp: ${timeList}">
           <td th:text="${timestamp.id}"></td>
-          <td th:text="${#temporals.format(timestamp.startTime,'HH:mm:ss dd-MM-yyyy')}"></td>
-          <td th:text="${#temporals.format(timestamp.endTime,'HH:mm:ss dd-MM-yyyy')}"></td>
+          <td th:text="${#temporals.format(timestamp.startTime,'dd.MM.yyyy HH:mm:ss')}"></td>
+          <td th:text="${#temporals.format(timestamp.endTime,'dd.MM.yyyy HH:mm:ss')}"></td>
         </tr>
         </tbody>
       </table>
@@ -98,7 +114,7 @@
   </div>
   <div class="container py-2 pb-4">
     <div class="d-flex justify-content-between align-items-center">
-      <h4 class="m-0">Task comments</h4>
+      <h4 class="m-0"><i class="fa-solid fa-comment"></i> Task comments</h4>
       <button type="button" class="btn btn-md btn-danger " id="modalButton" data-toggle="modal"
               data-target="#modal">
         Add new comment
@@ -106,10 +122,10 @@
     </div>
     <hr/>
   </div>
-  <div class="row mb-4" th:each="comment : ${comments}">
+  <div class="row container mb-4 mx-0" th:each="comment : ${comments}">
     <div class="col-8 d-flex gap-4 w-100">
       <h5 th:text="${comment.createdBy.getFullName()}">name</h5>
-      <span th:text="${comment.createdAt}">created at</span>
+      <span th:text="${#dates.format(comment.createdAt,'HH:mm dd.MM.yyyy')}">created at</span>
     </div>
     <hr class="m-0"/>
     <div class="container" style="border-left: 1px solid lightgray">

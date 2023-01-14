@@ -15,7 +15,7 @@
 
     <div class="p-3">
         <div class="p-2">
-            <h4>Basic information</h4>
+            <h4><i class="fa-solid fa-info-circle"></i> Basic information</h4>
             <hr/>
             <div class="row">
                 <div class="col-md-6">
@@ -26,7 +26,7 @@
         </div>
 
         <div class="p-2">
-            <h4>Additional information</h4>
+            <h4><i class="fa-solid fa-database"></i> Additional information</h4>
             <hr/>
             <div class="row">
                 <div class="col-md-6">
@@ -49,7 +49,7 @@
         </div>
 
         <div class="p-2" th:if="${project.canUserEditProject(#authentication.getPrincipal().getUser())}">
-            <h4>Data manipulation</h4>
+            <h4><i class="fa-solid fa-hand"></i> Data manipulation</h4>
             <hr/>
             <div class="row">
                 <div class="col-md-6">
@@ -61,7 +61,7 @@
             </div>
         </div>
         <div class="p-2">
-            <h4>Users assigned to project</h4>
+            <h4><i class="fa-solid fa-table"></i> Users assigned to project</h4>
             <hr/>
             <div class="row">
                 <div class="col-md-12">
@@ -96,20 +96,20 @@
     <!-- Tasks Section -->
     <div class="my-5 p-3 d-flex flex-column">
         <div class="w-100 d-flex justify-content-between my-2">
-            <h2>Tasks to this project</h2>
+            <h2><i class="fa-solid fa-circle-xmark"></i> Active tasks for this project</h2>
             <button th:if="${project.canUserEditProject(#authentication.getPrincipal().getUser())}" type="button" class="btn btn-md btn-danger" id="modalButton" data-toggle="modal"
                     data-target="#modal">
-                Create new task
+                Create new task <i class="fa-solid fa-circle-plus" style="color:white"></i>
             </button>
         </div>
         <div class="d-flex flex-wrap" th:if="${!projectTasks.isEmpty()}">
-              <div class="noUnderline p-2 card m-2" style="width: 15rem" th:each="task: ${projectTasks}">
+              <div class="noUnderline p-2 card m-2" style="width: 18rem" th:each="task: ${projectTasks}">
                   <a th:title="'Click here to see details of ' + ${task.name}" th:href="@{'/dashboard/task/detail/'+${task.id}}">
-                      <span class="card-body">
+                      <div class="card-body">
                         <h5 class="text-black card-title"><b th:text="${task.name}"></b></h5>
                         <h6 class="card-subtitle mb-2 text-muted"><b>Task description:</b></h6>
                         <p class="innerRichText card-text" th:utext="${#strings.abbreviate(task.content, 30)}"></p>
-                      </span>
+                      </div>
                   </a>
               </div>
         </div>
@@ -124,16 +124,16 @@
          class="d-flex my-5 p-3 flex-column">
         <div th:if="${!finishedTasks.isEmpty()}">
             <div class="w-100 d-flex justify-content-between my-2">
-                <h2>Finished tasks for this project</h2>
+                <h2><i class="fa-solid fa-circle-check"></i> Finished tasks for this project</h2>
             </div>
             <div class="d-flex flex-wrap">
-              <div class="noUnderline p-2 card m-2" style="width: 15rem" th:each="task: ${finishedTasks}">
-                <a th:title="'Click here to see details of ' + ${task.name}" th:href="@{'/dashboard/task/'+${task.id}}">
-                  <span class="card-body">
+              <div class="noUnderline p-2 card m-2" style="width: 18rem" th:each="task: ${finishedTasks}">
+                <a th:title="'Click here to see details of ' + ${task.name}" th:href="@{'/dashboard/task/detail/'+${task.id}}">
+                  <div class="card-body">
                     <h5 class="text-black card-title"><b th:text="${task.name}"></b></h5>
                     <h6 class="card-subtitle mb-2 text-muted"><b>Task description:</b></h6>
                     <p class="innerRichText card-text" th:utext="${#strings.abbreviate(task.content, 30)}"></p>
-                  </span>
+                  </div>
                 </a>
               </div>
             </div>
