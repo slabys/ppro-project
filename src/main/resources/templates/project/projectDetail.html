@@ -104,7 +104,7 @@
         </div>
         <div class="d-flex flex-wrap" th:if="${!projectTasks.isEmpty()}">
               <div class="noUnderline p-2 card m-2" style="width: 15rem" th:each="task: ${projectTasks}">
-                  <a th:title="'Click here to see details of ' + ${task.name}" th:href="@{'/dashboard/task/'+${task.id}}">
+                  <a th:title="'Click here to see details of ' + ${task.name}" th:href="@{'/dashboard/task/detail/'+${task.id}}">
                       <span class="card-body">
                         <h5 class="text-black card-title"><b th:text="${task.name}"></b></h5>
                         <h6 class="card-subtitle mb-2 text-muted"><b>Task description:</b></h6>
