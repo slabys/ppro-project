@@ -31,7 +31,7 @@
       <div>
         <h4><i class="fa-solid fa-tasks"></i> Description:</h4>
       </div>
-      <form th:if="${task.completed == false}" th:action="@{'/dashboard/task/finish/'+${task.id}}" th:method="POST">
+      <form th:if="${task.completed == false && task.assignedToProject !=null}" th:action="@{'/dashboard/task/finish/'+${task.id}}" th:method="POST">
         <div>
           <input th:value="${task.id}" type="hidden" name="task"/>
           <button class="btn" type="submit">Mark as finished <i class="fa-solid fa-circle-check" style="color:white"></i> </button>
@@ -51,7 +51,7 @@
     <hr/>
     <form class="py-1" th:action="@{/dashboard/task/addTime}" th:object="${newTaskTime}" th:method="POST">
       <input type="hidden" th:value="${task.id}" name="task">
-      <input type="hidden" th:value="${task.assignedToProject.id}" name="project">
+      <input type="hidden" th:value="${task.assignedToProject?.id}" name="project">
       <input type="hidden" th:value="${user.id}" name="user">
       <div class="row">
         <div class="col col-sm-12 col-md-5">
@@ -141,7 +141,7 @@
           <input type="hidden" th:value="${task.id}" name="task">
           <div class="d-flex flex-row py-1">
             <label class="col-form-label text-start w-25"><b>Project name:</b></label>
-            <input type="text" th:value="${task.assignedToProject.name}" class="form-control" readonly disabled>
+            <input type="text" th:value="${task.assignedToProject?.name}" class="form-control" readonly disabled>
           </div>
           <div class="d-flex flex-row py-1">
             <label class="col-form-label text-start w-25"><b>Task name:</b></label>
