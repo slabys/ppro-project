@@ -152,10 +152,9 @@
         <div layout:fragment="modalContent">
             <form th:action="@{/dashboard/project/newTask}" th:object="${newTask}" th:method="POST">
                 <div class="form-group row py-1">
-                    <input type="hidden" th:value="${project.id}" name="project">
                     <div class="d-flex flex-row">
                         <label class="col-form-label text-start w-25"><b>Project ID:</b></label>
-                        <input type="text" th:value="${project.id}" class="form-control" readonly disabled>
+                        <input type="text" th:value="${project.id}" name="projectId" class="form-control" readonly>
                     </div>
                     <div class="d-flex flex-row py-1">
                         <label class="col-form-label text-start w-25"><b>Project name:</b></label>
