@@ -65,6 +65,7 @@ public class TaskController {
             throw new ResponseStatusException(NOT_FOUND, "Unable to find project");
         }
         List<Comment> comments = task.get().getTaskComments();
+        Collections.reverse(comments);
 
         List<TaskTime> taskTimeArrayList = taskTimeRepository.findAllUserTimes(loggedUser,task);
         List<TaskTime> thisMonthTime = new ArrayList<TaskTime>();
@@ -85,7 +86,7 @@ public class TaskController {
         m.addAttribute("user",loggedUser);
         m.addAttribute("hoursWorked",hoursWorked);
         m.addAttribute("timeList",thisMonthTime);
-        m.addAttribute("comments",comments);
+        m.addAttribute("comments", comments);
         return "task/taskDetail";
     }
 
