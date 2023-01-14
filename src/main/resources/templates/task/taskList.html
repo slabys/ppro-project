@@ -24,6 +24,7 @@
         <th>Project name</th>
         <th>Content</th>
         <th style="width: 50px">Link</th>
+        <th style="width: 50px">Edit</th>
       </tr>
       </thead>
       <tbody>
@@ -32,6 +33,7 @@
         <td th:text="${task.name}">Project name</td>
         <td th:utext="${#strings.abbreviate(task.content,30)}" class="innerRichText">Project content</td>
         <td><a th:href="@{'/dashboard/task/detail/' + ${task.id}}"><i class="fa-solid fa-magnifying-glass"></i></a></td>
+        <td><a th:href="@{'/dashboard/task/edit/' + ${task.id}}"><i class="fa-solid fa-edit"></i></a></td>
       </tr>
       </tbody>
     </table>

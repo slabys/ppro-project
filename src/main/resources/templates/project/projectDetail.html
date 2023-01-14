@@ -10,7 +10,7 @@
     <div class="d-flex justify-content-between align-items-center">
         <h1>Project details</h1>
         <a title="Edit project" th:href="@{'/dashboard/project/manage/edit/'+${project.id}}"><i
-                class="bi bi-pencil-fill h3"></i></a>
+                class="fa-solid fa-edit h3"></i></a>
     </div>
 
     <div class="p-3">
@@ -19,8 +19,8 @@
             <hr/>
             <div class="row">
                 <div class="col-md-6">
-                    <p><b>ID:</b> <span th:text="${project.id}"></span></p>
-                    <p><b>Name of the project:</b> <span th:text="${project.name}"></span></p>
+                    <p><i class="fa-solid fa-hashtag"></i> <b>ID:</b> <span th:text="${project.id}"></span></p>
+                    <p><i class="fa-solid fa-file"></i> <b>Name of the project:</b> <span th:text="${project.name}"></span></p>
                 </div>
             </div>
         </div>
@@ -30,32 +30,32 @@
             <hr/>
             <div class="row">
                 <div class="col-md-6">
-                    <p><b>Assigned owner:</b>
+                    <p><i class="fa-solid fa-user-circle"></i> <b>Assigned owner:</b>
                         <span th:text="${project.projectOwner?.getFullName()?:'No one assigned'}">No one assigned </span>
                         <span
                                 th:text="'(' + ${#strings.capitalize(#strings.toLowerCase(project.projectOwner?.role))?:'No role'} + ')'"></span>
                         <a target="_blank" th:title="'Show details of '+${project.projectOwner?.getFullName()}"
                            th:href="@{'/dashboard/user/detail/'+${project.projectOwner?.id}}">
-                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <i th:if="${project.projectOwner != null}" class="fa-solid fa-magnifying-glass"></i>
                         </a>
                     </p>
-                    <p><b>Description:</b> <span th:text="${project.description}"></span></p>
+                    <p><i class="fa-solid fa-pen"></i> <b>Description:</b> <span th:text="${project.description}"></span></p>
                 </div>
                 <div class="col-md-6">
-                    <p><b>URL:</b> <span th:text="${project.url}"></span></p>
-                    <p><b>Project info:</b> <span th:text="${project.projectInfo}"></span></p>
+                    <p><i class="fa-solid fa-globe"></i> <b>URL:</b> <span th:text="${project.url}"></span></p>
+                    <p><i class="fa-solid fa-pen"></i> <b>Project info:</b> <span th:text="${project.projectInfo}"></span></p>
                 </div>
             </div>
         </div>
 
-        <div class="p-2">
+        <div class="p-2" th:if="${project.canUserEditProject(#authentication.getPrincipal().getUser())}">
             <h4>Data manipulation</h4>
             <hr/>
             <div class="row">
                 <div class="col-md-6">
-                    <p><b>Created at:</b> <span
+                    <p><i class="fa-solid fa-add"></i> <b>Created at:</b> <span
                             th:text="${#dates.format(project.createdAt, 'HH:mm:ss dd.MM.yyyy')}"></span></p>
-                    <p><b>Last time edited:</b> <span
+                    <p><i class="fa-solid fa-pen"></i> <b>Last time edited:</b> <span
                             th:text="${#dates.format(project.lastEditedAt, 'HH:mm:ss dd.MM.yyyy')}"></span></p>
                 </div>
             </div>
@@ -94,10 +94,10 @@
     </div>
 
     <!-- Tasks Section -->
-    <div class="my-5 d-flex flex-column">
+    <div class="my-5 p-3 d-flex flex-column">
         <div class="w-100 d-flex justify-content-between my-2">
             <h2>Tasks to this project</h2>
-            <button type="button" class="btn btn-md btn-danger" id="modalButton" data-toggle="modal"
+            <button th:if="${project.canUserEditProject(#authentication.getPrincipal().getUser())}" type="button" class="btn btn-md btn-danger" id="modalButton" data-toggle="modal"
                     data-target="#modal">
                 Create new task
             </button>
@@ -121,7 +121,7 @@
     </div>
 
     <div th:if="${project.projectOwner == #authentication.getPrincipal().getUser() || #authentication.getPrincipal().getUser().hasHigherRole()}"
-         class="d-flex my-5 flex-column">
+         class="d-flex my-5 p-3 flex-column">
         <div th:if="${!finishedTasks.isEmpty()}">
             <div class="w-100 d-flex justify-content-between my-2">
                 <h2>Finished tasks for this project</h2>

@@ -76,10 +76,10 @@
 
       <h3>Users</h3>
       <h4>
-        <a th:href="@{/dashboard/users}"><i class="bi-table me-2"></i>List of users</a>
+        <a sec:authorize="hasRole('ROLE_OWNER')" th:href="@{/dashboard/users}"><i class="bi-table me-2"></i>List of users</a>
       </h4>
       <h4>
-        <a th:href="@{/dashboard/registerUser}"><i class="bi-person-plus me-2"></i>Register new user</a>
+        <a sec:authorize="hasRole('ROLE_OWNER')" th:href="@{/dashboard/registerUser}"><i class="bi-person-plus me-2"></i>Register new user</a>
       </h4>
       <h4>
         <a th:href="@{/dashboard/user/editMyAccount}"><i class="bi-person me-2"></i>Edit my account</a>
@@ -96,7 +96,7 @@
       </h4>
       <hr/>
 
-      <h3>Tasks</h3>
+      <h3 sec:authorize="hasRole('ROLE_OWNER')">Tasks</h3>
       <h4 sec:authorize="hasRole('ROLE_OWNER')"><a th:href="@{/dashboard/tasks}">
         <i class="fa-solid fa-list-check me-2"></i>Task list (All tasks)</a>
       </h4>

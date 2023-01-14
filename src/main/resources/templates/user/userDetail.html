@@ -8,20 +8,20 @@
 <body>
 <section layout:fragment="content" class="container py-4">
     <div>
-        <h1>User details</h1>
+        <h1><i class="fa-solid fa-circle-user" ></i> User details</h1>
     </div>
 
-    <div class="p-3">
+    <div class="container p-3">
         <div class="p-2">
         <h4>Basic information</h4>
         <hr/>
         <div class="row">
             <div class="col-md-6">
-                <p><b>ID:</b> <span th:text="${user.id}"></span></p>
-                <p><b>First name:</b> <span th:text="${user.firstName}"></span></p>
-                <p><b>Last name:</b> <span th:text="${user.lastName}"></span></p>
-                <p><b>Email:</b> <span th:text="${user.email}"></span></p>
-                <p sec:authorize="hasRole('ROLE_OWNER')"><b>Salary:</b> <span th:text="${#numbers.formatDecimal(user.salary, 0, 'WHITESPACE', 0, 'POINT' )}"></span>$</p>
+                <p><i class="fa-solid fa-id-card" ></i> <b>ID:</b> <span th:text="${user.id}"></span></p>
+                <p><i class="fa-solid fa-signature" ></i> <b>First name:</b> <span th:text="${user.firstName}"></span></p>
+                <p><i class="fa-solid fa-signature" ></i> <b>Last name:</b> <span th:text="${user.lastName}"></span></p>
+                <p><i class="fa-solid fa-mail-bulk" ></i> <b>Email:</b> <span th:text="${user.email}"></span></p>
+                <p sec:authorize="hasRole('ROLE_OWNER')"><i class="fa-solid fa-sack-dollar" ></i> <b>Salary ($/hour):</b> <span th:text="${#numbers.formatDecimal(user.salary, 0, 'WHITESPACE', 0, 'POINT' )}"></span>$</p>
             </div>
         </div>
         </div>
@@ -31,17 +31,18 @@
         <hr/>
         <div class="row">
             <div class="col-md-6">
-                <p><b>Address:</b></p>
-                <p><b>Street address:</b> <span th:text="${user.contact.street}"></span></p>
-                <p><b>City:</b> <span th:text="${user.contact.city}"></span></p>
-                <p><b>Zip code:</b> <span th:text="${user.contact.zipCode}"></span></p>
-                <p><b>State:</b> <span th:text="${user.contact.state}"></span></p>
-                <hr />
-                <p><b>Contact:</b></p>
-                <p><b>Phone:</b> <span th:text="${user.contact.phone}"></span></p>
-                <p><b>Bank account:</b> <span th:text="${user.contact.bankAccount}"></span></p>
+                <p><i class="fa-solid fa-street-view" ></i> <b>Street address:</b> <span th:text="${user.contact.street}"></span></p>
+                <p><i class="fa-solid fa-building" ></i> <b>City:</b> <span th:text="${user.contact.city}"></span></p>
             </div>
-        </div>
+            <div class="col-md-6">
+                <p><i class="fa-solid fa-hashtag" ></i> <b>Zip code:</b> <span th:text="${user.contact.zipCode}"></span></p>
+                <p><i class="fa-solid fa-globe" ></i> <b>State:</b> <span th:text="${user.contact.state}"></span></p>
+            </div>
+            <div class="col-md-6">
+                <p><i class="fa-solid fa-phone" ></i> <b>Phone:</b> <span th:text="${user.contact.phone}"></span></p>
+                <p><i class="fa-solid fa-bank" ></i> <b>Bank account:</b> <span th:text="${user.contact.bankAccount}"></span></p>
+            </div>
+            </div>
         </div>
 
         <div class="p-2">
@@ -49,18 +50,18 @@
         <hr/>
         <div class="row">
             <div class="col-md-6">
-                <p><b>Created at:</b> <span th:text="${#dates.format(user.createdAt, 'HH:mm:ss dd.MM.yyyy')}"></span></p>
-                <p><b>Last time edited:</b> <span th:text="${#dates.format(user.lastEditedAt, 'HH:mm:ss dd.MM.yyyy')}"></span></p>
+                <p><i class="fa-solid fa-add" ></i> <b>Created at:</b> <span th:text="${#dates.format(user.createdAt, 'HH:mm:ss dd.MM.yyyy')}"></span></p>
+                <p><i class="fa-solid fa-edit" ></i> <b>Last time edited:</b> <span th:text="${#dates.format(user.lastEditedAt, 'HH:mm:ss dd.MM.yyyy')}"></span></p>
             </div>
         </div>
         </div>
 
-        <div class="p-2">
+        <div class="p-2" th:if="${!user.projects.isEmpty()}">
             <h4>User is assigned to these projects</h4>
             <hr/>
             <div class="row">
                 <div class="col-md-12">
-                    <table class="table table-striped table-bordered text-center">
+                    <table class="table table-striped table-bordered text-center" id="datatable">
                         <thead class="thead-dark">
                         <tr>
                             <th>Project ID</th>

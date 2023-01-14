@@ -22,6 +22,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Controller
@@ -62,6 +63,7 @@ public class ProjectController {
 
     @PostMapping("/dashboard/project/newTask")
     public String addTaskToProject(HttpServletRequest request,long projectId, Task newTask, Authentication auth, RedirectAttributes redirectAttrs) {
+        User user = ((CustomUserDetails) auth.getPrincipal()).getUser();
         Optional<Project> project = projectRepository.findById(projectId);
         if(project.isEmpty()){
             redirectAttrs.addFlashAttribute("error", "Project does not exists");
@@ -71,7 +73,10 @@ public class ProjectController {
                 return "redirect:" + request.getHeader("Referer");
             }
         }
-        User user = ((CustomUserDetails) auth.getPrincipal()).getUser();
+        if(!project.get().canUserEditProject(user)){
+            redirectAttrs.addFlashAttribute("error", "You don't have permissions to do this action");
+            throw new ResponseStatusException(FORBIDDEN);
+        }
         newTask.setAssignedToProject(project.get());
         newTask.setCreatedBy(user);
         taskRepository.save(newTask);
@@ -135,11 +140,15 @@ public class ProjectController {
     }
 
     @PostMapping("/dashboard/project/manage/edit")
-    public String editProject(Project project, RedirectAttributes redirectAttrs, Authentication auth) {
+    public String editProject(HttpServletRequest request,Project project, RedirectAttributes redirectAttrs, Authentication auth) {
         projectRepository.save(project);
         if (isProjectInvalidOrUserCannotEditProject(Optional.of(project), auth, redirectAttrs)) return "redirect:/";
         redirectAttrs.addFlashAttribute("info", "Edit of project with name " + project.getName() + " was successful");
-        return "redirect:/";
+        if(request.getHeader("Referer").isEmpty()){
+            return "redirect:/dashboard/project/list/user";
+        }else{
+            return "redirect:" + request.getHeader("Referer");
+        }
     }
 
     @GetMapping("/dashboard/project/list")
@@ -208,7 +217,7 @@ public class ProjectController {
     }
 
     @PostMapping("/dashboard/project/manage/addPeople")
-    public String addPeopleToProject(@RequestParam long id, RedirectAttributes redirectAttrs, @RequestParam List<Long> users, Authentication auth) {
+    public String addPeopleToProject(HttpServletRequest request,@RequestParam long id, RedirectAttributes redirectAttrs, @RequestParam List<Long> users, Authentication auth) {
         Optional<Project> project = projectRepository.findById(id);
         if (isProjectInvalidOrUserCannotEditProject(project, auth, redirectAttrs))
             return "redirect:/dashboard/project/list";
@@ -223,7 +232,11 @@ public class ProjectController {
             }
         }
         redirectAttrs.addFlashAttribute("info", "Successfully added users to project called '" + project.get().getName() + "'");
-        return "redirect:/dashboard/project/list";
+        if(request.getHeader("Referer").isEmpty()){
+            return "redirect:/dashboard/project/list/user";
+        }else{
+            return "redirect:" + request.getHeader("Referer");
+        }
     }
 
     @GetMapping("/dashboard/project/manage/removePeople/{id}")
@@ -244,7 +257,7 @@ public class ProjectController {
     }
 
     @PostMapping("/dashboard/project/manage/removePeople")
-    public String removePeopleFromProject(@RequestParam long id, RedirectAttributes redirectAttrs, @RequestParam List<Long> users, Authentication auth) {
+    public String removePeopleFromProject(HttpServletRequest request,@RequestParam long id, RedirectAttributes redirectAttrs, @RequestParam List<Long> users, Authentication auth) {
         Optional<Project> project = projectRepository.findById(id);
         if (isProjectInvalidOrUserCannotEditProject(project, auth, redirectAttrs)) return "redirect:/dashboard/project/list";
         for (Long userID : users) {
@@ -257,7 +270,11 @@ public class ProjectController {
             }
         }
         redirectAttrs.addFlashAttribute("info", "Successfully removed users from project called '" + project.get().getName() + "'");
-        return "redirect:/dashboard/project/list";
+        if(request.getHeader("Referer").isEmpty()){
+            return "redirect:/dashboard/project/list/user";
+        }else{
+            return "redirect:" + request.getHeader("Referer");
+        }
     }
 
     //checks if project is invalid or if user can't edit project -> returns error/redirect
