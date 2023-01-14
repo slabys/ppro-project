@@ -33,13 +33,51 @@
   <div class="container py-5">
     <h4>Work time</h4>
     <hr/>
+    <form class="py-1" th:action="@{/dashboard/task/addTime}" th:object="${newTaskTime}" th:method="POST">
+      <input type="hidden" th:value="${task.id}" name="task">
+      <input type="hidden" th:value="${task.assignedToProject.id}" name="project">
+      <input type="hidden" th:value="${user.id}" name="user">
+      <div class="row">
+        <div class="col col-sm-12 col-md-5">
+          <label class="col-form-label text-start"><b>Work started at:</b></label>
+          <input class="form-control w-75" type="datetime-local" id="startTime"
+                 name="startTimeString" step="1">
+        </div>
+        <div class="col col-12 col-md-5">
+          <label class="col-form-label text-start"><b>Work ended at:</b></label>
+          <input class="form-control w-75" type="datetime-local" id="endTime"
+                 name="endTimeString" step="1">
+        </div>
+        <div class="col col-12 col-md-2 pt-4 pt-md-0 d-flex align-items-end">
+          <button type="submit" class="btn btn-md btn-danger">Add work time</button>
+        </div>
+      </div>
+
+      <script defer>
+          window.addEventListener('load', () => {
+              var now = new Date();
+              now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+
+              /* remove millisecond */
+              now.setMilliseconds(null)
+
+              document.getElementById('startTime').value = now.toISOString().slice(0, -1);
+              document.getElementById('endTime').value = now.toISOString().slice(0, -1);
+          });
+      </script>
+    </form>
     <div>
-      <p>So far you worked <b><span th:text="${hoursWorked}"></span> hours</b> on this task.<br/> Your estimated earning on this task is:
-      <details>
-        <summary>Click to show earning</summary>
-        <span th:text="${hoursWorked * user.salary}"></span>$
-      </details>
-      </p>
+      <div class="d-flex flex-column flex-md-row mt-4 gap-0 gap-md-4 mb-4">
+        <p>
+          <span>So far you worked</span>
+          <b><span th:text="${hoursWorked}"></span> hours</b>
+          <span>on this task</span>
+        </p>
+        <details>
+          <summary><u>Earnings</u></summary>
+          <span th:text="${hoursWorked * user.salary}"></span>$
+        </details>
+      </div>
       <table th:if="${!timeList.isEmpty()}" id="datatable" class="table table-striped table-bordered text-center">
         <thead class="thead-dark">
         <tr>
@@ -57,55 +95,25 @@
         </tbody>
       </table>
     </div>
-    <form class="py-1" th:action="@{/dashboard/task/addTime}" th:object="${newTaskTime}" th:method="POST">
-      <input type="hidden" th:value="${task.id}" name="task">
-      <input type="hidden" th:value="${task.assignedToProject.id}" name="project">
-      <input type="hidden" th:value="${user.id}" name="user">
-      <div class="col-md-6">
-        <label class="col-form-label text-start w-25"><b>Work started at:</b></label>
-        <input class="form-control w-75" type="datetime-local" id="startTime"
-               name="startTimeString" step="1">
-      </div>
-      <div class="col-md-6">
-        <label class="col-form-label text-start w-25"><b>Work ended at:</b></label>
-        <input class="form-control w-75" type="datetime-local" id="endTime"
-                      name="endTimeString" step="1">
-      </div>
-      <div class="d-flex py-4">
-        <button type="submit" class="btn btn-md btn-danger">Add work time</button>
-      </div>
-      <script defer>
-        window.addEventListener('load', () => {
-          var now = new Date();
-          now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-
-          /* remove millisecond */
-          now.setMilliseconds(null)
-
-          document.getElementById('startTime').value = now.toISOString().slice(0, -1);
-          document.getElementById('endTime').value = now.toISOString().slice(0, -1);
-        });
-      </script>
-    </form>
   </div>
-  <div class="container py-2">
-    <div class="d-flex flex-row flex-wrap">
-      <div class="col-md-10">
-      <h4>Task comments</h4>
-      </div>
-      <div>
-        <button type="button" class="btn btn-md btn-danger " id="modalButton" data-toggle="modal"
-                data-target="#modal">
-          Add new comment
-        </button>
-      </div>
+  <div class="container py-2 pb-4">
+    <div class="d-flex justify-content-between align-items-center">
+      <h4 class="m-0">Task comments</h4>
+      <button type="button" class="btn btn-md btn-danger " id="modalButton" data-toggle="modal"
+              data-target="#modal">
+        Add new comment
+      </button>
     </div>
     <hr/>
-    <div class="d-flex shadow flex-row p-2 m-2 rounded-2" th:each="comment : ${comments}">
-      <div class="flex-row">
-        <h5 class="w-100" th:text="${comment.createdBy.getFullName()}"></h5>
-        <p th:text="${comment.content}"></p>
-      </div>
+  </div>
+  <div class="row mb-4" th:each="comment : ${comments}">
+    <div class="col-8 d-flex gap-4 w-100">
+      <h5 th:text="${comment.createdBy.getFullName()}">name</h5>
+      <span th:text="${comment.createdAt}">created at</span>
+    </div>
+    <hr class="m-0"/>
+    <div class="container" style="border-left: 1px solid lightgray">
+      <p th:utext="${comment.content}">comment</p>
     </div>
   </div>
 
@@ -126,8 +134,9 @@
           <label class="col-form-label text-start"><b>Comment:</b></label>
           <div class="col-sm-12 col-md-6">
             <div class="input-group">
-              <input type="text" th:field="*{content}" class="form-control" placeholder="Add your comment here"
-                     aria-label="name" required minlength="2" maxlength="255">
+              <textarea type="text" id="editor" rows="4" placeholder="Add your comment here" class="form-control"
+                        aria-label="Add your comment here"
+                        th:field="*{content}" autocomplete="off"></textarea>
             </div>
           </div>
         </div>
