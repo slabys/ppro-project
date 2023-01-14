@@ -8,8 +8,10 @@ import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
 
-@Entity
+
 @NoArgsConstructor
+@Entity
+@Table(name="task")
 public class Task extends BaseModel{
     @Getter @Setter @OneToOne(targetEntity = User.class)
     private User createdBy;
