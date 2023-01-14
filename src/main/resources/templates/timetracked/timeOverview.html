@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/layout}">
+<head>
+  <meta charset="UTF-8">
+  <title>Employerr - Tasks</title>
+</head>
+<body>
+<section layout:fragment="content" class="container py-4">
+  <div th:each="overview: ${timeOverview}">
+    <p th:text="${overview.userName}"></p>
+    <p th:text="${overview.duration}"></p>
+  </div>
+</section>
+</body>
+</html>

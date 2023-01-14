@@ -12,4 +12,7 @@ import java.util.Optional;
 public interface TaskTimeRepository extends JpaRepository<TaskTime,Long> {
     @Query("select u from TaskTime u where u.user = ?1 and u.task = ?2")
     public List<TaskTime> findAllUserTimes(User loggedUser, Optional<Task> task);
+
+    @Query("select u from TaskTime u where u.user = ?1")
+    public List<TaskTime> findTimeByUser(User loggedUser);
 }
