@@ -31,17 +31,6 @@ public class Project extends BaseModel{
     @ManyToMany(mappedBy = "projects") @Getter @Setter
     private Set<User> usersOnProject = new HashSet<User>();
 
-    @Getter @Setter
-    @OneToMany(targetEntity = Comment.class)
-    @JoinTable(name = "project_comments",
-            joinColumns = { @JoinColumn(name = "project_id") },
-            inverseJoinColumns = { @JoinColumn(name = "project_comment_id") })
-    private List<Comment> projectComments = new java.util.ArrayList<>();
-
-    public void addComment(Comment comment){
-        projectComments.add(comment);
-    }
-
     public boolean canUserEditProject(User user){
         if(this.projectOwner!=null){
             return (this.projectOwner.getId().equals(user.getId()) || user.getRole() == RoleEnum.ADMIN || user.getRole() == RoleEnum.OWNER);

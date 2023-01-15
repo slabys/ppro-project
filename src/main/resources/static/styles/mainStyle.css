@@ -70,3 +70,9 @@ table {
 .fa-solid{
     color: var(--bs-red);
 }
+.non-auth{
+    background-image: url("../images/wallpaper.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}

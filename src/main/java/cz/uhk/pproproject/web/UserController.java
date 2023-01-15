@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.*;
@@ -126,7 +127,7 @@ public class UserController {
 
     @Transactional
     @PostMapping("/dashboard/registerUser")
-    public String processRegister(Model m, User user, RedirectAttributes redirectAttrs) throws IOException {
+    public String processRegister(HttpServletRequest request,Model m, User user, RedirectAttributes redirectAttrs) throws IOException {
         User userSearch = userRepo.findByEmail(user.appendCompanyEmail(user.getEmail()));
         UserActivationToken activeToken = uatRepo.findActiveByUserEmail(user.appendCompanyEmail(user.getEmail()));
         Contact contact = new Contact();
@@ -145,8 +146,8 @@ public class UserController {
 
         if (activeToken == null) {
             user.setActive(false);
-            user.setEmail(user.appendCompanyEmail(user.getEmail()));
-            user.setRegistrationEmail(user.getRegistrationEmail());
+            user.setEmail(user.appendCompanyEmail(user.getEmail().trim().toLowerCase()));
+            user.setRegistrationEmail(user.getRegistrationEmail().trim().toLowerCase());
             user.setFirstName(user.getFirstName().substring(0, 1).toUpperCase() + user.getFirstName().substring(1));
             user.setLastName(user.getLastName().substring(0, 1).toUpperCase() + user.getLastName().substring(1));
             user.setContact(contact);
@@ -162,7 +163,11 @@ public class UserController {
                 emailService.sendSimpleMail(new EmailDetails(tokenEmail.getSendTo().getRegistrationEmail(), tokenEmail.getContent(), tokenEmail.getSubject(), null));
 
             redirectAttrs.addFlashAttribute("info", "Account created successfully");
-            return "redirect:/";
+            if(request.getHeader("Referer").isEmpty()){
+                return "redirect:/dashboard/project/list/user";
+            }else{
+                return "redirect:" + request.getHeader("Referer");
+            }
         }
         return "redirect:/";
     }

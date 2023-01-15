@@ -9,7 +9,7 @@
 <section layout:fragment="content" class="container py-4">
     <div class="d-flex justify-content-between align-items-center">
         <h1>Project details</h1>
-        <a title="Edit project" th:href="@{'/dashboard/project/manage/edit/'+${project.id}}"><i
+        <a th:if="${project.canUserEditProject(#authentication.getPrincipal().getUser())}" title="Edit project" th:href="@{'/dashboard/project/manage/edit/'+${project.id}}"><i
                 class="fa-solid fa-edit h3"></i></a>
     </div>
 
@@ -124,7 +124,7 @@
          class="d-flex my-5 p-3 flex-column">
         <div th:if="${!finishedTasks.isEmpty()}">
             <div class="w-100 d-flex justify-content-between my-2">
-                <h2><i class="fa-solid fa-circle-check"></i> Finished tasks for this project</h2>
+                <h2><i class="fa-solid fa-check-circle"></i> Finished tasks for this project</h2>
             </div>
             <div class="d-flex flex-wrap">
               <div class="noUnderline p-2 card m-2" style="width: 18rem" th:each="task: ${finishedTasks}">
@@ -140,7 +140,7 @@
         </div>
         <div th:if="${finishedTasks.isEmpty()}">
             <div class="w-100 d-flex justify-content-between my-2">
-                <h2>Finished tasks for this project</h2>
+                <h2><i class="fa-solid fa-check-circle"></i> Finished tasks for this project</h2>
             </div>
             <p>You should start working, this project has 0 finished tasks!</p>
             <img class="rounded-2" src="https://media.tenor.com/17TDIc019zYAAAAC/upisnotjump-start.gif">

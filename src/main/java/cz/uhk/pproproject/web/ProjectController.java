@@ -126,7 +126,7 @@ public class ProjectController {
         } else {
             redirectAttrs.addFlashAttribute("error", "Project ownership assign was not successful, because project does not exists");
         }
-        return "redirect:/dashboard/project/list";
+        return "redirect:/";
     }
 
     @GetMapping("/dashboard/project/manage/edit/{id}")
@@ -144,11 +144,7 @@ public class ProjectController {
         projectRepository.save(project);
         if (isProjectInvalidOrUserCannotEditProject(Optional.of(project), auth, redirectAttrs)) return "redirect:/";
         redirectAttrs.addFlashAttribute("info", "Edit of project with name " + project.getName() + " was successful");
-        if(request.getHeader("Referer").isEmpty()){
             return "redirect:/dashboard/project/list/user";
-        }else{
-            return "redirect:" + request.getHeader("Referer");
-        }
     }
 
     @GetMapping("/dashboard/project/list")
@@ -163,8 +159,9 @@ public class ProjectController {
     public String showAccessibleProjectList(Model m, Authentication auth) {
         CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
         User user = userDetails.getUser();
-
-        m.addAttribute("projects", user.getProjects());
+        Optional<User> updatedUser = userRepository.findById(user.getId());
+        userDetails.updateUserDetails(updatedUser.get());
+        m.addAttribute("projects", updatedUser.get().getProjects());
         return "project/projectList";
     }
 
@@ -180,10 +177,11 @@ public class ProjectController {
 
         CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
         User user = userDetails.getUser();
+        User lookupUser = userRepository.findByEmail(user.getEmail());
 
-        if (!userRepository.findByEmail(user.getEmail()).hasAccessToProject(project.get())) {
+        if (!lookupUser.hasAccessToProject(project.get())) {
             redirectAttrs.addFlashAttribute("error", "You don't have permissions to view this project details");
-            return "redirect:/dashboard/project/list";
+            return "redirect:/";
         }
 
         for(Task task : projectTasks ) {
@@ -232,11 +230,7 @@ public class ProjectController {
             }
         }
         redirectAttrs.addFlashAttribute("info", "Successfully added users to project called '" + project.get().getName() + "'");
-        if(request.getHeader("Referer").isEmpty()){
-            return "redirect:/dashboard/project/list/user";
-        }else{
-            return "redirect:" + request.getHeader("Referer");
-        }
+            return "redirect:/";
     }
 
     @GetMapping("/dashboard/project/manage/removePeople/{id}")
@@ -270,11 +264,7 @@ public class ProjectController {
             }
         }
         redirectAttrs.addFlashAttribute("info", "Successfully removed users from project called '" + project.get().getName() + "'");
-        if(request.getHeader("Referer").isEmpty()){
-            return "redirect:/dashboard/project/list/user";
-        }else{
-            return "redirect:" + request.getHeader("Referer");
-        }
+            return "redirect:/";
     }
 
     //checks if project is invalid or if user can't edit project -> returns error/redirect

@@ -23,7 +23,7 @@ public interface UserRepository extends JpaRepository<User,Long> {
     @Query("SELECT distinct  u from User u where u.active = true and u.role= 'MANAGER' and not(:project member of u.projects) order by u.firstName, u.lastName")
     List<User> findAllManagersNotInProject(Project project);
 
-    @Query("SELECT distinct  u from User u where u.active = true and (u.role= 'ADMIN' or u.role = 'OWNER') and not(:project member of u.projects) order by u.firstName, u.lastName")
+    @Query("SELECT distinct  u from User u where u.active = true and u.role = 'OWNER' and not(:project member of u.projects) order by u.firstName, u.lastName")
     List<User> findAllHighRolesNotInProject(Project project);
 
     @Query("SELECT distinct u from User u where u.active = true and u.role= 'EMPLOYEE' and (:project member of u.projects) order by u.firstName, u.lastName")
@@ -32,7 +32,7 @@ public interface UserRepository extends JpaRepository<User,Long> {
     @Query("SELECT distinct  u from User u where u.active = true and u.role= 'MANAGER' and (:project member of u.projects) order by u.firstName, u.lastName")
     List<User> findAllManagersInProject(Project project);
 
-    @Query("SELECT distinct  u from User u where u.active = true and (u.role= 'ADMIN' or u.role = 'OWNER') and (:project member of u.projects) order by u.firstName, u.lastName")
+    @Query("SELECT distinct  u from User u where u.active = true and u.role = 'OWNER' and (:project member of u.projects) order by u.firstName, u.lastName")
     List<User> findAllHighRolesInProject(Project project);
 
     @Query("select count(u) from User u where u.active = true")

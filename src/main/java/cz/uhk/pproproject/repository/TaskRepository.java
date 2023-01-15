@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TaskRepository extends JpaRepository<Task,Long> {
-    @Query("SELECT u FROM Task u WHERE u.assignedToProject = ?1 and u.completed=false")
+    @Query("SELECT u FROM Task u WHERE u.assignedToProject = ?1 and u.completed=false order by u.createdAt desc")
     public List<Task> findAllTaskByAssignedProject(Project assignedProjectId);
 
-    @Query("SELECT u FROM Task u WHERE u.assignedToProject = ?1 and u.completed=true")
+    @Query("SELECT u FROM Task u WHERE u.assignedToProject = ?1 and u.completed=true order by u.createdAt desc")
     public List<Task> findAllFinishedTasksByAssignedProject(Project id);
 
     @Query("SELECT count(u) FROM Task u WHERE u.completed=false")

@@ -5,21 +5,23 @@
   <meta charset="UTF-8">
   <title>Employerr - dashboard</title>
 </head>
-<body>
+<body th:class="${accessibleProjects} == null ?'non-auth':''">
 <section layout:fragment="content" class="container-lg py-4">
   <div sec:authorize="!isAuthenticated()" class="d-flex flex-column justify-content-center align-items-center h-100 align-items-start">
+    <div class="bg-white p-5 rounded-3">
     <h1 class="f-flex">
       <span class="d-flex align-self-start h2" style="color: var(--bs-red)">Hello!</span> Welcome to <u>Employerr</u>!
     </h1>
     <div class="d-flex flex-column">
       <a th:href="@{/login}">
-        <button class="w-100 mt-4 p-3 border-0"
+        <button class="w-100 rounded-2 mt-4 p-3 border-0"
                 style="font-size: 1.5rem; line-height: 1.75rem; font-weight: bold">
           Log In
         </button>
       </a>
       <p class=" text-center mt-2
             ">Don't have account yet? <a href="mailto:admin@employerr.com">Contact admin.</a></p>
+    </div>
     </div>
   </div>
 

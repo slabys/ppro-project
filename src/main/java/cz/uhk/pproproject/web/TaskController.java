@@ -67,6 +67,7 @@ public class TaskController {
                 throw new ResponseStatusException(FORBIDDEN, "You don't have permission view this project");
             }
         List<Comment> comments = task.get().getTaskComments();
+        comments.sort(Comparator.comparing(Comment::getCreatedAt));
         Collections.reverse(comments);
 
         List<TaskTime> taskTimeArrayList = taskTimeRepository.findAllUserTimes(loggedUser,task);
