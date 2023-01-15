@@ -45,7 +45,11 @@ public class HomeController {
                     numOfUsersOnProject += project.getUsersOnProject().size();
                     count++;
                 }
-                float averageOnProjects = numOfUsersOnProject / count;
+                float averageOnProjects = 0;
+                if(count != 0){
+                   averageOnProjects = numOfUsersOnProject / count;
+                }
+
                 Stats stats = new Stats(userRepo.countAllEmployees(),userRepo.countAllManagers(), userRepo.countAllActive(), userRepo.avgSalary(),userRepo.sumSalary(),projectRepository.countAll(),projectRepository.countWithoutOwner(),taskRepository.count(),taskRepository.countAllNoncompletedTasks(),taskRepository.countAllFinishedTasksByAssignedProject(),averageOnProjects);
 
                 m.addAttribute("stats",stats);
