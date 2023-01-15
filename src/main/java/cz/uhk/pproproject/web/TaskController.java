@@ -47,7 +47,7 @@ public class TaskController {
     public String showAllTasks(Model m) {
         List<Task> taskList = taskRepository.findAll();
         for (Task task : taskList) {
-            task.setContent(task.getContent().replaceAll("\\<[^>]*>",""));
+            task.setContent(task.getContent().replaceAll("\\<[^>]*>", ""));
         }
         m.addAttribute("taskList", taskList);
         return "task/taskList";
@@ -62,33 +62,33 @@ public class TaskController {
             redirectAttrs.addFlashAttribute("error", "Task does not exist");
             throw new ResponseStatusException(NOT_FOUND, "Unable to find project");
         }
-            if (!loggedUser.hasAccessToProject(task.get().getAssignedToProject())) {
-                redirectAttrs.addFlashAttribute("info", "You don't have permissions to view this task");
-                throw new ResponseStatusException(FORBIDDEN, "You don't have permission view this project");
-            }
+        if (!loggedUser.hasAccessToProject(task.get().getAssignedToProject())) {
+            redirectAttrs.addFlashAttribute("info", "You don't have permissions to view this task");
+            throw new ResponseStatusException(FORBIDDEN, "You don't have permission view this project");
+        }
         List<Comment> comments = task.get().getTaskComments();
         comments.sort(Comparator.comparing(Comment::getCreatedAt));
         Collections.reverse(comments);
 
-        List<TaskTime> taskTimeArrayList = taskTimeRepository.findAllUserTimes(loggedUser,task);
+        List<TaskTime> taskTimeArrayList = taskTimeRepository.findAllUserTimes(loggedUser, task);
         List<TaskTime> thisMonthTime = new ArrayList<TaskTime>();
         LocalDate today = LocalDate.now();
         float hoursWorked = 0;
-        for(TaskTime taskTime: taskTimeArrayList){
-            if(today.getMonth() == taskTime.getStartTime().getMonth()){
+        for (TaskTime taskTime : taskTimeArrayList) {
+            if (today.getMonth() == taskTime.getStartTime().getMonth()) {
                 thisMonthTime.add(taskTime);
             }
             Duration dur = Duration.between(taskTime.getStartTime(), taskTime.getEndTime());
-            hoursWorked += dur.toHours() + ((float)dur.toMinutesPart()/60);
+            hoursWorked += dur.toHours() + ((float) dur.toMinutesPart() / 60);
         }
         hoursWorked = Float.parseFloat(df.format(hoursWorked));
 
         m.addAttribute("task", task.get());
-        m.addAttribute("newComment",new Comment());
-        m.addAttribute("newTaskTime",new TaskTime());
-        m.addAttribute("user",loggedUser);
-        m.addAttribute("hoursWorked",hoursWorked);
-        m.addAttribute("timeList",thisMonthTime);
+        m.addAttribute("newComment", new Comment());
+        m.addAttribute("newTaskTime", new TaskTime());
+        m.addAttribute("user", loggedUser);
+        m.addAttribute("hoursWorked", hoursWorked);
+        m.addAttribute("timeList", thisMonthTime);
         m.addAttribute("comments", comments);
         return "task/taskDetail";
     }
@@ -109,19 +109,56 @@ public class TaskController {
         return "redirect:/dashboard/tasks";
     }
 
+    @GetMapping("/dashboard/task/edit/{id}")
+    public String editTaskForm(Authentication auth, Model m, @PathVariable long id, RedirectAttributes redirectAttrs) {
+        CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+        User loggedUser = userDetails.getUser();
+        Optional<Task> task = taskRepository.findById(id);
+        if (task.isEmpty()) {
+            redirectAttrs.addFlashAttribute("error", "Task does not exist");
+            throw new ResponseStatusException(NOT_FOUND, "Unable to find project");
+        }
+        if (!loggedUser.hasAccessToProject(task.get().getAssignedToProject())) {
+            redirectAttrs.addFlashAttribute("info", "You don't have permissions to view this task");
+            throw new ResponseStatusException(FORBIDDEN, "You don't have permission view this project");
+        }
+
+        m.addAttribute("task", task.get());
+        return "forms/task/editTask";
+    }
+
+    @PostMapping("/dashboard/task/edit")
+    public String editTask(Task task, RedirectAttributes redirectAttrs, Authentication auth) {
+
+        Optional<Task> taskFromRepo = taskRepository.findById(task.getId());
+        if (taskFromRepo.isEmpty()) {
+            redirectAttrs.addFlashAttribute("error", "Task does not exist");
+            throw new ResponseStatusException(NOT_FOUND, "Unable to find project");
+        }
+        taskFromRepo.get().setCreatedBy(task.getCreatedBy());
+        taskFromRepo.get().setCompletedBy(task.getCompletedBy());
+        taskFromRepo.get().setName(task.getName());
+        taskFromRepo.get().setContent(task.getContent());
+        taskFromRepo.get().setAssignedToProject(task.getAssignedToProject());
+        taskRepository.save(taskFromRepo.get());
+
+        redirectAttrs.addFlashAttribute("info", "Task successfully edited.");
+        return "redirect:/dashboard/tasks";
+    }
+
     @PostMapping("/dashboard/task/newComment")
-    public String addComment(Comment comment,Long task,RedirectAttributes redirectAttributes, Authentication auth, HttpServletRequest request){
+    public String addComment(Comment comment, Long task, RedirectAttributes redirectAttributes, Authentication auth, HttpServletRequest request) {
         User user = ((CustomUserDetails) auth.getPrincipal()).getUser();
         Optional<Task> lookupTask = taskRepository.findById(task);
-        if(lookupTask.isEmpty()){
+        if (lookupTask.isEmpty()) {
             redirectAttributes.addFlashAttribute("info", "Error occurred, task not found");
-            if(request.getHeader("Referer").isEmpty()){
+            if (request.getHeader("Referer").isEmpty()) {
                 return "redirect:/dashboard/project/list/user";
-            }else{
+            } else {
                 return "redirect:" + request.getHeader("Referer");
             }
         }
-        if(!user.hasAccessToProject(lookupTask.get().getAssignedToProject())){
+        if (!user.hasAccessToProject(lookupTask.get().getAssignedToProject())) {
             redirectAttributes.addFlashAttribute("info", "You don't have permissions to comment this task");
             throw new ResponseStatusException(FORBIDDEN, "You don't have permission to comment this task");
         }
@@ -130,17 +167,17 @@ public class TaskController {
         lookupTask.get().addComment(comment);
         taskRepository.save(lookupTask.get());
 
-        if(request.getHeader("Referer").isEmpty()){
+        if (request.getHeader("Referer").isEmpty()) {
             return "redirect:/dashboard/project/list/user";
-        }else{
+        } else {
             return "redirect:" + request.getHeader("Referer");
         }
     }
 
     @PostMapping("/dashboard/task/addTime")
-    public String addTimeToTask(Authentication auth,HttpServletRequest request, TaskTime taskTime, RedirectAttributes redirectAttributes, String startTimeString, String endTimeString){
+    public String addTimeToTask(Authentication auth, HttpServletRequest request, TaskTime taskTime, RedirectAttributes redirectAttributes, String startTimeString, String endTimeString) {
         User user = ((CustomUserDetails) auth.getPrincipal()).getUser();
-        if(!user.hasAccessToProject(taskTime.getTask().getAssignedToProject())){
+        if (!user.hasAccessToProject(taskTime.getTask().getAssignedToProject())) {
             redirectAttributes.addFlashAttribute("info", "You don't have permissions to add time to this task");
             throw new ResponseStatusException(FORBIDDEN, "You don't have permission to add time to this task");
         }
@@ -148,12 +185,12 @@ public class TaskController {
         taskTime.setEndTime(LocalDateTime.parse(endTimeString));
         Duration dur = Duration.between(taskTime.getStartTime(), taskTime.getEndTime());
 
-        if((dur.toMinutesPart() < 0) || dur.toHours() < 0 || dur.toSecondsPart() < 0){
+        if ((dur.toMinutesPart() < 0) || dur.toHours() < 0 || dur.toSecondsPart() < 0) {
             redirectAttributes.addFlashAttribute("error", "Time cannot be negative");
 
-            if(request.getHeader("Referer").isEmpty()){
+            if (request.getHeader("Referer").isEmpty()) {
                 return "redirect:/dashboard/project/list/user";
-            }else{
+            } else {
                 return "redirect:" + request.getHeader("Referer");
             }
         }
@@ -161,17 +198,17 @@ public class TaskController {
         taskTimeRepository.save(taskTime);
         redirectAttributes.addFlashAttribute("info", "Time on task successfully added.");
 
-        if(request.getHeader("Referer").isEmpty()){
+        if (request.getHeader("Referer").isEmpty()) {
             return "redirect:/dashboard/project/list/user";
-        }else{
+        } else {
             return "redirect:" + request.getHeader("Referer");
         }
     }
 
     @PostMapping("/dashboard/task/finish/{id}")
-    public String finishTask(HttpServletRequest request, @PathVariable long id,Task task, RedirectAttributes redirectAttributes, Authentication auth){
+    public String finishTask(HttpServletRequest request, @PathVariable long id, Task task, RedirectAttributes redirectAttributes, Authentication auth) {
         User user = ((CustomUserDetails) auth.getPrincipal()).getUser();
-        if(!user.hasAccessToProject(task.getAssignedToProject())){
+        if (!user.hasAccessToProject(task.getAssignedToProject())) {
             redirectAttributes.addFlashAttribute("info", "You don't have permissions to finish this task");
             throw new ResponseStatusException(FORBIDDEN, "You don't have permission to finish this project");
         }
@@ -182,6 +219,6 @@ public class TaskController {
         taskRepository.save(task);
         redirectAttributes.addFlashAttribute("info", "Task marked as finished successfully");
 
-        return "redirect:/dashboard/project/detail/"+task.getAssignedToProject().getId();
+        return "redirect:/dashboard/project/detail/" + task.getAssignedToProject().getId();
     }
 }

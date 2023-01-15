@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/layout}">
+<head>
+  <meta charset="UTF-8">
+  <title>Employerr - Tasks</title>
+  <script defer async>
+      function handleOpenAccordion(userName) {
+          const toOpen = 'accordion_' + userName;
+          if (document.getElementById(toOpen).classList.contains('show')) {
+              document.getElementById(toOpen).classList.remove('show')
+          } else {
+              document.getElementById(toOpen).classList.add('show')
+          }
+      }
+  </script>
+</head>
+<body>
+<section layout:fragment="content" class="container py-4">
+  <div class="accordion" th:each="overview: ${timeOverview}">
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button d-flex justify-content-between" th:id="'button_'+${overview.userName}"
+                th:data-id="${overview.userName}" type="button"
+                th:onclick="handleOpenAccordion(this.getAttribute('data-id'))">
+          <span th:text="${overview.userName}"></span>
+          <span th:text="${overview.totalDuration}"></span>
+        </button>
+      </h2>
+      <div class="accordion-collapse collapse"
+           th:id="'accordion_'+${overview.userName}">
+        <div class="p-4" th:if="${overview.timeByTask.size() == 0}">
+          <p class="m-0">This user didn't track any time on any task so far.</p>
+        </div>
+
+        <div class="accordion-body d-flex justify-content-between" th:each="tasksWithTime: ${overview.timeByTask}">
+          <span th:text="${tasksWithTime.key}"></span>
+          <span th:text="${tasksWithTime.value}"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>

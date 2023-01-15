@@ -140,7 +140,7 @@ public class ProjectController {
     }
 
     @PostMapping("/dashboard/project/manage/edit")
-    public String editProject(HttpServletRequest request,Project project, RedirectAttributes redirectAttrs, Authentication auth) {
+    public String editProject(Project project, RedirectAttributes redirectAttrs, Authentication auth) {
         projectRepository.save(project);
         if (isProjectInvalidOrUserCannotEditProject(Optional.of(project), auth, redirectAttrs)) return "redirect:/";
         redirectAttrs.addFlashAttribute("info", "Edit of project with name " + project.getName() + " was successful");
@@ -273,7 +273,6 @@ public class ProjectController {
             redirectAttrs.addFlashAttribute("error", "Project does not exists");
             throw new ResponseStatusException(NOT_FOUND, "Project detail does not exists");
         }
-        CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
         User user = ((CustomUserDetails) auth.getPrincipal()).getUser();
         if (!project.get().canUserEditProject(user)) {
             redirectAttrs.addFlashAttribute("error", "You don't have permissions to change this project");

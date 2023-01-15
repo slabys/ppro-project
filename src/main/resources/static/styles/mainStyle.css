@@ -70,6 +70,10 @@ table {
 .fa-solid{
     color: var(--bs-red);
 }
+
+.accordion-button:after {
+    display: none;
+}
 .non-auth{
     background-image: url("../images/wallpaper.jpg");
     background-size: cover;

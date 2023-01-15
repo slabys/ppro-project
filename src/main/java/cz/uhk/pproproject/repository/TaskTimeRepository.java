@@ -14,5 +14,5 @@ public interface TaskTimeRepository extends JpaRepository<TaskTime,Long> {
     public List<TaskTime> findAllUserTimes(User loggedUser, Optional<Task> task);
 
     @Query("select u from TaskTime u where u.user = ?1")
-    public List<TaskTime> findTimeByUser(User loggedUser);
+    public List<TaskTime> findTaskTimeByUser(User loggedUser);
 }
