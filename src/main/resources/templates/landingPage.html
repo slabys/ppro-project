@@ -103,10 +103,10 @@
     </div>
   </div>
 
-  <div class="my-5">
+  <div th:if="${stats != null}" class="my-5">
   <h3><i class="fa-solid fa-list"></i> Usage statistics</h3>
     <hr/>
-  <div class="d-flex flex-row justify-content-evenly flex-wrap" th:if="${stats != null}">
+  <div class="d-flex flex-row justify-content-evenly flex-wrap">
 
     <div class="shadow p-3 m-2 rounded-2 col-md-4">
       <h5><i class="fa-solid fa-users rounded-3 p-1" style="background-color:lightpink" ></i> User statistics</h5>

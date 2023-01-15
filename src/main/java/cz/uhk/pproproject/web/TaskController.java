@@ -1,14 +1,8 @@
 package cz.uhk.pproproject.web;
 
 import cz.uhk.pproproject.middleware.CustomUserDetails;
-import cz.uhk.pproproject.model.Comment;
-import cz.uhk.pproproject.model.Task;
-import cz.uhk.pproproject.model.TaskTime;
-import cz.uhk.pproproject.model.User;
-import cz.uhk.pproproject.repository.CommentRepository;
-import cz.uhk.pproproject.repository.TaskRepository;
-import cz.uhk.pproproject.repository.TaskTimeRepository;
-import cz.uhk.pproproject.repository.UserRepository;
+import cz.uhk.pproproject.model.*;
+import cz.uhk.pproproject.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -16,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -26,7 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.*;
 
 
 @Controller
@@ -42,6 +37,9 @@ public class TaskController {
 
     @Autowired
     private CommentRepository commentRepository;
+
+    @Autowired
+    private ProjectRepository projectRepository;
 
     private static final DecimalFormat df = new DecimalFormat("0.00");
 
@@ -61,13 +59,13 @@ public class TaskController {
         User loggedUser = userDetails.getUser();
         Optional<Task> task = taskRepository.findById(id);
         if (task.isEmpty()) {
-            redirectAttrs.addFlashAttribute("error", "Project does not exist");
+            redirectAttrs.addFlashAttribute("error", "Task does not exist");
             throw new ResponseStatusException(NOT_FOUND, "Unable to find project");
         }
-        if(!loggedUser.hasAccessToProject(task.get().getAssignedToProject())){
-            redirectAttrs.addFlashAttribute("info", "You don't have permissions to view this task");
-            return "redirect:/";
-        }
+            if (!loggedUser.hasAccessToProject(task.get().getAssignedToProject())) {
+                redirectAttrs.addFlashAttribute("info", "You don't have permissions to view this task");
+                throw new ResponseStatusException(FORBIDDEN, "You don't have permission view this project");
+            }
         List<Comment> comments = task.get().getTaskComments();
         Collections.reverse(comments);
 
@@ -124,7 +122,7 @@ public class TaskController {
         }
         if(!user.hasAccessToProject(lookupTask.get().getAssignedToProject())){
             redirectAttributes.addFlashAttribute("info", "You don't have permissions to comment this task");
-            return "redirect:/";
+            throw new ResponseStatusException(FORBIDDEN, "You don't have permission to comment this task");
         }
         comment.setCreatedBy(user);
         commentRepository.save(comment);
@@ -143,7 +141,7 @@ public class TaskController {
         User user = ((CustomUserDetails) auth.getPrincipal()).getUser();
         if(!user.hasAccessToProject(taskTime.getTask().getAssignedToProject())){
             redirectAttributes.addFlashAttribute("info", "You don't have permissions to add time to this task");
-            return "redirect:/";
+            throw new ResponseStatusException(FORBIDDEN, "You don't have permission to add time to this task");
         }
         taskTime.setStartTime(LocalDateTime.parse(startTimeString));
         taskTime.setEndTime(LocalDateTime.parse(endTimeString));
@@ -174,7 +172,7 @@ public class TaskController {
         User user = ((CustomUserDetails) auth.getPrincipal()).getUser();
         if(!user.hasAccessToProject(task.getAssignedToProject())){
             redirectAttributes.addFlashAttribute("info", "You don't have permissions to finish this task");
-            return "redirect:/";
+            throw new ResponseStatusException(FORBIDDEN, "You don't have permission to finish this project");
         }
         task.setCompleted(true);
         task.setCompletedAt(new Date());

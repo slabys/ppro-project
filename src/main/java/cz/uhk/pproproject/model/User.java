@@ -69,7 +69,14 @@ public class User extends BaseModel implements Comparable<User>{
             inverseJoinColumns = { @JoinColumn(name = "project_id") })
     private List<Project> projects;
     public boolean hasAccessToProject(Project project){
-        return this.projects.contains(project) || this.getRole() == RoleEnum.ADMIN || Objects.equals(project.getProjectOwner().getId(), this.getId());
+        for (Project proj: projects) {
+            if(proj.getId().equals(project.getId())) return true;
+        }
+        if(project.getProjectOwner() != null) {
+            return Objects.equals(project.getProjectOwner().getId(), this.getId());
+        }else{
+            return this.getRole() == RoleEnum.ADMIN;
+        }
     }
     public void addProject(Project project){
         this.projects.add(project);
