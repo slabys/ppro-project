@@ -17,6 +17,21 @@
 </head>
 <body>
 <section layout:fragment="content" class="container py-4">
+  <form class="py-1" th:action="@{/dashboard/timeOverview }" th:method="GET">
+    <div class="row py-2">
+      <div class="col col-sm-12 col-md-5">
+        <label class="col-form-label text-start"><b>Tracked time start:</b></label>
+        <input class="form-control w-75" type="date" name="trackedTimeStart">
+      </div>
+      <div class="col col-12 col-md-5">
+        <label class="col-form-label text-start"><b>Tracked time end:</b></label>
+        <input class="form-control w-75" type="date" name="trackedTimeEnd">
+      </div>
+      <div class="col col-12 col-md-2 pt-4 pt-md-0 d-flex align-items-end">
+        <button type="submit" class="btn btn-md btn-danger">Filter time</button>
+      </div>
+    </div>
+  </form>
   <div class="accordion" th:each="overview: ${timeOverview}">
     <div class="accordion-item">
       <h2 class="accordion-header">

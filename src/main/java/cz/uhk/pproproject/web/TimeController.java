@@ -5,11 +5,14 @@ import cz.uhk.pproproject.repository.TaskRepository;
 import cz.uhk.pproproject.repository.TaskTimeRepository;
 import cz.uhk.pproproject.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 
 @Controller
@@ -20,35 +23,57 @@ public class TimeController {
     @Autowired
     private TaskTimeRepository taskTimeRepository;
 
-    @Autowired
-    private TaskRepository taskRepository;
-
     @GetMapping("/dashboard/timeOverview")
-    public String showTimeOverview(Model m) {
+    public String showTimeOverview(
+            @RequestParam(required = false, name = "trackedTimeStart") @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<LocalDate> trackedTimeStart,
+            @RequestParam(required = false, name = "trackedTimeEnd") @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<LocalDate> trackedTimeEnd,
+            Model m) {
+        System.out.println("=======================================================================================");
+        System.out.println(trackedTimeStart);
+        System.out.println(trackedTimeEnd);
+
         List<User> userRepo = userRepository.findAllActive();
         List<TimePerUser> timeOverview = new ArrayList<>();
 
         Map<String, Float> timeByTask = new HashMap<>();
 
         Duration totalTimeTracked;
-        Duration taskTimeTotal;
+        Duration taskTimeTotal = Duration.ofDays(0);
         float totalTime = 0;
         for (User user : userRepo) {
             List<TaskTime> taskTimeRepoByUser = taskTimeRepository.findTaskTimeByUser(user);
 
             for (TaskTime taskTime : taskTimeRepoByUser) {
-                if (Objects.equals(user.getId(), taskTime.getUser().getId())) {
-                    if (!timeByTask.containsKey(taskTime.getTask().getName())) {
-                        taskTimeTotal = Duration.between(taskTime.getStartTime(), taskTime.getEndTime());
-                        timeByTask.put(taskTime.getTask().getName(), taskTimeTotal.toHours() + ((float) taskTimeTotal.toMinutesPart() / 60));
-                    } else {
-                        float additionalTime = timeByTask.get(taskTime.getTask().getName());
-                        Duration tmpTime = Duration.between(taskTime.getStartTime(), taskTime.getEndTime());
-                        additionalTime += tmpTime.toHours() + ((float) tmpTime.toMinutesPart() / 60);
-                        timeByTask.put(taskTime.getTask().getName(), additionalTime);
+                if (trackedTimeStart.isEmpty() && trackedTimeEnd.isEmpty() ||
+                        (
+                                trackedTimeStart.isPresent() && trackedTimeEnd.isPresent() &&
+                                        (taskTime.getStartTime().isAfter(trackedTimeStart.get().atStartOfDay()) &&
+                                                (taskTime.getEndTime().isBefore(trackedTimeEnd.get().atStartOfDay())))
+                        )
+                        ||
+                        (
+                                trackedTimeStart.isPresent() && trackedTimeEnd.isEmpty() &&
+                                        (taskTime.getStartTime().isAfter(trackedTimeStart.get().atStartOfDay()))
+                        )
+                        ||
+                        (
+                                trackedTimeEnd.isPresent() && trackedTimeStart.isEmpty() &&
+                                                (taskTime.getEndTime().isBefore(trackedTimeEnd.get().atStartOfDay()))
+                        )
+                ) {
+                    if (Objects.equals(user.getId(), taskTime.getUser().getId())) {
+                        if (!timeByTask.containsKey(taskTime.getTask().getName())) {
+                            taskTimeTotal = Duration.between(taskTime.getStartTime(), taskTime.getEndTime());
+                            timeByTask.put(taskTime.getTask().getName(), taskTimeTotal.toHours() + ((float) taskTimeTotal.toMinutesPart() / 60));
+                        } else {
+                            float additionalTime = timeByTask.get(taskTime.getTask().getName());
+                            Duration tmpTime = Duration.between(taskTime.getStartTime(), taskTime.getEndTime());
+                            additionalTime += tmpTime.toHours() + ((float) tmpTime.toMinutesPart() / 60);
+                            timeByTask.put(taskTime.getTask().getName(), additionalTime);
+                        }
+                        totalTimeTracked = Duration.between(taskTime.getStartTime(), taskTime.getEndTime());
+                        totalTime += totalTimeTracked.toHours() + ((float) totalTimeTracked.toMinutesPart() / 60);
                     }
-                    totalTimeTracked = Duration.between(taskTime.getStartTime(), taskTime.getEndTime());
-                    totalTime += totalTimeTracked.toHours() + ((float) totalTimeTracked.toMinutesPart() / 60);
                 }
             }
 
