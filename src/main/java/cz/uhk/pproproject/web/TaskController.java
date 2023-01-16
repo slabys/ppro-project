@@ -118,8 +118,8 @@ public class TaskController {
             redirectAttrs.addFlashAttribute("error", "Task does not exist");
             throw new ResponseStatusException(NOT_FOUND, "Unable to find project");
         }
-        if (!loggedUser.hasAccessToProject(task.get().getAssignedToProject())) {
-            redirectAttrs.addFlashAttribute("info", "You don't have permissions to view this task");
+        if (!task.get().getAssignedToProject().canUserEditProject(loggedUser)) {
+            redirectAttrs.addFlashAttribute("error", "You don't have permissions to view this task");
             throw new ResponseStatusException(FORBIDDEN, "You don't have permission view this project");
         }
 
@@ -135,11 +135,8 @@ public class TaskController {
             redirectAttrs.addFlashAttribute("error", "Task does not exist");
             throw new ResponseStatusException(NOT_FOUND, "Unable to find project");
         }
-        taskFromRepo.get().setCreatedBy(task.getCreatedBy());
-        taskFromRepo.get().setCompletedBy(task.getCompletedBy());
         taskFromRepo.get().setName(task.getName());
         taskFromRepo.get().setContent(task.getContent());
-        taskFromRepo.get().setAssignedToProject(task.getAssignedToProject());
         taskRepository.save(taskFromRepo.get());
 
         redirectAttrs.addFlashAttribute("info", "Task successfully edited.");

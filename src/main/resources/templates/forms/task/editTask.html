@@ -3,7 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/layout}">
 <head>
   <meta charset="UTF-8">
-  <title>New task</title>
+  <title>Edit task</title>
 </head>
 <body>
 <section layout:fragment="content" class="container py-4">
@@ -13,8 +13,6 @@
       <div class="d-flex flex-column justify-content-end">
         <form th:action="@{/dashboard/task/edit}" th:object="${task}" th:method="POST">
           <input type="hidden" th:value="${task.id}" th:name="id">
-          <input type="" th:value="${task.createdBy.id}" th:name="createdById">
-          <input type="" th:value="${task.assignedToProject.id}" th:name="assignedToProjectId">
           <div class="form-group row py-1">
             <h4>Edit task information</h4>
             <hr/>

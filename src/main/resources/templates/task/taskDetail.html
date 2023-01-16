@@ -33,6 +33,7 @@
       </div>
       <form th:if="${task.completed == false && task.assignedToProject !=null}" th:action="@{'/dashboard/task/finish/'+${task.id}}" th:method="POST">
         <div>
+          <button title="Edit this task" class="btn" th:if="${task.getAssignedToProject.canUserEditProject(#authentication.getPrincipal().getUser())}" th:href="@{'/dashboard/task/edit/' + ${task.id}}"><i class="fa-solid fa-edit text-white"></i></button>
           <input th:value="${task.id}" type="hidden" name="task"/>
           <button class="btn" type="submit">Mark as finished <i class="fa-solid fa-circle-check" style="color:white"></i> </button>
         </div>
