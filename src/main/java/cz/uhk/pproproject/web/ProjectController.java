@@ -7,7 +7,6 @@ import cz.uhk.pproproject.model.User;
 import cz.uhk.pproproject.repository.ProjectRepository;
 import cz.uhk.pproproject.repository.TaskRepository;
 import cz.uhk.pproproject.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -20,23 +19,29 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Controller
 public class ProjectController {
-    @Autowired
-    private ProjectRepository projectRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private TaskRepository taskRepository;
+    private final ProjectRepository projectRepository;
+    private final UserRepository userRepository;
+    private final TaskRepository taskRepository;
+
+    public ProjectController(ProjectRepository projectRepository, UserRepository userRepository, TaskRepository taskRepository) {
+        this.projectRepository = projectRepository;
+        this.userRepository = userRepository;
+        this.taskRepository = taskRepository;
+    }
 
     @GetMapping("/dashboard/project/manage/new")
     @PreAuthorize("hasRole('ROLE_OWNER')")
-    public String showProjectForm(Model m, Project project) {
+    public String showProjectForm(Model m) {
         m.addAttribute("project", new Project());
         return "forms/project/projectForm";
     }
@@ -48,7 +53,6 @@ public class ProjectController {
 
     @PostMapping("/dashboard/project/manage/new")
     public String addProject(Project project, RedirectAttributes redirectAttrs, Authentication auth) {
-        CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
         User user = ((CustomUserDetails) auth.getPrincipal()).getUser();
         project.setProjectOwner(null);
 
@@ -107,7 +111,7 @@ public class ProjectController {
 
     @PostMapping("/dashboard/project/manage/setOwner")
     @PreAuthorize("hasRole('ROLE_OWNER')")
-    public String setProjectOwner(Project project, RedirectAttributes redirectAttrs, Authentication auth) {
+    public String setProjectOwner(Project project, RedirectAttributes redirectAttrs) {
         Optional<Project> projectToEdit = projectRepository.findById(project.getId());
         if (projectToEdit.isPresent()) {
             User oldOwner = project.getProjectOwner();
@@ -133,7 +137,6 @@ public class ProjectController {
     public String editProject(Model m, @PathVariable long id, RedirectAttributes redirectAttrs, Authentication auth) {
         Optional<Project> project = projectRepository.findById(id);
         if (isProjectInvalidOrUserCannotEditProject(project, auth, redirectAttrs)) return "redirect:/";
-
         m.addAttribute("project", project.get());
 
         return "forms/project/projectEditForm";
@@ -185,10 +188,10 @@ public class ProjectController {
         }
 
         for(Task task : projectTasks ) {
-            task.setContent(task.getContent().replaceAll("\\<[^>]*>"," "));
+            task.setContent(task.getContent().replaceAll("<[^>]*>"," "));
         }
         for(Task task : finishedTasks){
-            task.setContent(task.getContent().replaceAll("\\<[^>]*>"," "));
+            task.setContent(task.getContent().replaceAll("<[^>]*>"," "));
         }
         m.addAttribute("project", project.get());
         m.addAttribute("projectTasks", projectTasks);
@@ -215,14 +218,14 @@ public class ProjectController {
     }
 
     @PostMapping("/dashboard/project/manage/addPeople")
-    public String addPeopleToProject(HttpServletRequest request,@RequestParam long id, RedirectAttributes redirectAttrs, @RequestParam List<Long> users, Authentication auth) {
+    public String addPeopleToProject(@RequestParam long id, RedirectAttributes redirectAttrs, @RequestParam List<Long> users, Authentication auth) {
         Optional<Project> project = projectRepository.findById(id);
         if (isProjectInvalidOrUserCannotEditProject(project, auth, redirectAttrs))
             return "redirect:/dashboard/project/list";
 
         for (Long userID : users) {
             Optional<User> optUser = userRepository.findById(userID);
-            User selectedUser = null;
+            User selectedUser;
             if (optUser.isPresent()) {
                 selectedUser = optUser.get();
                 selectedUser.addProject(project.get());
@@ -251,12 +254,12 @@ public class ProjectController {
     }
 
     @PostMapping("/dashboard/project/manage/removePeople")
-    public String removePeopleFromProject(HttpServletRequest request,@RequestParam long id, RedirectAttributes redirectAttrs, @RequestParam List<Long> users, Authentication auth) {
+    public String removePeopleFromProject(@RequestParam long id, RedirectAttributes redirectAttrs, @RequestParam List<Long> users, Authentication auth) {
         Optional<Project> project = projectRepository.findById(id);
         if (isProjectInvalidOrUserCannotEditProject(project, auth, redirectAttrs)) return "redirect:/dashboard/project/list";
         for (Long userID : users) {
             Optional<User> optUser = userRepository.findById(userID);
-            User selectedUser = null;
+            User selectedUser;
             if (optUser.isPresent()) {
                 selectedUser = optUser.get();
                 selectedUser.removeFromProject(project.get());

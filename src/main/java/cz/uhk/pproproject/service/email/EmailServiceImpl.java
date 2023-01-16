@@ -1,6 +1,5 @@
 package cz.uhk.pproproject.service.email;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.SimpleMailMessage;
@@ -16,17 +15,20 @@ import java.util.Objects;
 @Service
 public class EmailServiceImpl implements EmailService {
 
-    @Autowired
-    private JavaMailSender javaMailSender;
+    private final JavaMailSender javaMailSender;
 
     @Value("${spring.mail.from}")
     private String sender;
 
     @Value("${spring.mail.toTrap}")
-    private String reciever;
+    private String trapMail;
 
     @Value("${cz.uhk.pproproject.emailSendToTrap}")
     private boolean mailMethod;
+
+    public EmailServiceImpl(JavaMailSender javaMailSender) {
+        this.javaMailSender = javaMailSender;
+    }
 
     public boolean sendSimpleMail(EmailDetails details)
     {
@@ -36,7 +38,7 @@ public class EmailServiceImpl implements EmailService {
 
             mailMessage.setFrom(sender);
             if(mailMethod){
-                mailMessage.setTo(reciever);
+                mailMessage.setTo(trapMail);
             }else{
                 mailMessage.setTo(details.getRecipient());
             }

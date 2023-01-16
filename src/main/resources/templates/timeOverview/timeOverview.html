@@ -32,25 +32,25 @@
       </div>
     </div>
   </form>
-  <div class="accordion" th:each="overview: ${timeOverview}">
+  <div class="accordion" th:if="${!timeOverview.isEmpty()}" th:each="overview: ${timeOverview}">
     <div class="accordion-item">
       <h2 class="accordion-header">
-        <button class="accordion-button d-flex justify-content-between" th:id="'button_'+${overview.userName}"
-                th:data-id="${overview.userName}" type="button"
+        <button class="accordion-button d-flex justify-content-between" th:id="'button_'+${overview.user.id}"
+                th:data-id="${overview.user.id}" type="button"
                 th:onclick="handleOpenAccordion(this.getAttribute('data-id'))">
-          <span th:text="${overview.userName}"></span>
-          <span th:text="${overview.totalDuration}"></span>
+          <span th:text="${overview.user.getFullName()}"></span>
+          <span th:text="${#numbers.formatDecimal(overview.totalDuration, 1, 'WHITESPACE', 2, 'POINT' )} + ' h => ' + ${#numbers.formatDecimal(overview.totalDuration * overview.user.salary, 1, 'WHITESPACE', 2, 'POINT' )} + ' $'"></span>
         </button>
       </h2>
       <div class="accordion-collapse collapse"
-           th:id="'accordion_'+${overview.userName}">
+           th:id="'accordion_'+${overview.user.id}">
         <div class="p-4" th:if="${overview.timeByTask.size() == 0}">
           <p class="m-0">This user didn't track any time on any task so far.</p>
         </div>
 
         <div class="accordion-body d-flex justify-content-between" th:each="tasksWithTime: ${overview.timeByTask}">
           <span th:text="${tasksWithTime.key}"></span>
-          <span th:text="${tasksWithTime.value}"></span>
+          <span th:text="${#numbers.formatDecimal(tasksWithTime.value, 1, 'WHITESPACE', 2, 'POINT' )} +' h'"></span>
         </div>
       </div>
     </div>

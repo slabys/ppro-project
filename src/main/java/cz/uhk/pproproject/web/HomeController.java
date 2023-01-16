@@ -19,14 +19,17 @@ import java.util.List;
 
 @Controller
 public class HomeController {
-    @Autowired
-    private UserRepository userRepo;
+    private final UserRepository userRepo;
 
-    @Autowired
-    private ProjectRepository projectRepository;
+    private final ProjectRepository projectRepository;
 
-    @Autowired
-    private TaskRepository taskRepository;
+    private final TaskRepository taskRepository;
+
+    public HomeController(UserRepository userRepo, ProjectRepository projectRepository, TaskRepository taskRepository) {
+        this.userRepo = userRepo;
+        this.projectRepository = projectRepository;
+        this.taskRepository = taskRepository;
+    }
 
     @GetMapping("/")
     public String showHomepage(Model m, Authentication auth){

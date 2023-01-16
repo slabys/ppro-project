@@ -1,46 +1,48 @@
 package cz.uhk.pproproject.web;
 
-import cz.uhk.pproproject.model.*;
-import cz.uhk.pproproject.repository.TaskRepository;
+import cz.uhk.pproproject.model.TaskTime;
+import cz.uhk.pproproject.model.TimePerUser;
+import cz.uhk.pproproject.model.User;
 import cz.uhk.pproproject.repository.TaskTimeRepository;
 import cz.uhk.pproproject.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.*;
 
 @Controller
 public class TimeController {
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private TaskTimeRepository taskTimeRepository;
+    private final TaskTimeRepository taskTimeRepository;
 
+    public TimeController(UserRepository userRepository, TaskTimeRepository taskTimeRepository) {
+        this.userRepository = userRepository;
+        this.taskTimeRepository = taskTimeRepository;
+    }
+
+    @PreAuthorize("hasRole('ROLE_OWNER')")
     @GetMapping("/dashboard/timeOverview")
     public String showTimeOverview(
             @RequestParam(required = false, name = "trackedTimeStart") @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<LocalDate> trackedTimeStart,
             @RequestParam(required = false, name = "trackedTimeEnd") @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<LocalDate> trackedTimeEnd,
             Model m) {
-        System.out.println("=======================================================================================");
-        System.out.println(trackedTimeStart);
-        System.out.println(trackedTimeEnd);
 
-        List<User> userRepo = userRepository.findAllActive();
+        List<User> allUsers = userRepository.findAllActive();
         List<TimePerUser> timeOverview = new ArrayList<>();
 
         Map<String, Float> timeByTask = new HashMap<>();
 
         Duration totalTimeTracked;
-        Duration taskTimeTotal = Duration.ofDays(0);
+        Duration taskTimeTotal;
         float totalTime = 0;
-        for (User user : userRepo) {
+        for (User user : allUsers){
             List<TaskTime> taskTimeRepoByUser = taskTimeRepository.findTaskTimeByUser(user);
 
             for (TaskTime taskTime : taskTimeRepoByUser) {
@@ -79,7 +81,7 @@ public class TimeController {
 
             timeOverview.add(
                     new TimePerUser(
-                            user.getFullName(), totalTime, timeByTask
+                            user, totalTime, timeByTask
                     )
             );
             totalTime = 0;

@@ -8,7 +8,6 @@ import cz.uhk.pproproject.repository.UserActivationTokenRepository;
 import cz.uhk.pproproject.repository.UserRepository;
 import cz.uhk.pproproject.service.email.EmailDetails;
 import cz.uhk.pproproject.service.email.EmailService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
@@ -19,13 +18,14 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
-import java.io.IOException;
 import java.util.*;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -33,16 +33,11 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @PropertySource("classpath:application.properties")
 @Controller
 public class UserController {
-    @Autowired
-    public EmailService emailService;
-    @Autowired
-    private UserRepository userRepo;
-    @Autowired
-    private UserActivationTokenRepository uatRepo;
-    @Autowired
-    private ContactRepository contactRepository;
-    @Autowired
-    private EmailRepository emailRepo;
+    public final EmailService emailService;
+    private final UserRepository userRepo;
+    private final UserActivationTokenRepository uatRepo;
+    private final ContactRepository contactRepository;
+    private final EmailRepository emailRepo;
 
     @Value("")
     private String repeatPassword;
@@ -55,9 +50,17 @@ public class UserController {
     @Value("${cz.uhk.pproproject.domain}")
     private String domain;
 
+    public UserController(EmailService emailService, UserRepository userRepo, UserActivationTokenRepository uatRepo, ContactRepository contactRepository, EmailRepository emailRepo) {
+        this.emailService = emailService;
+        this.userRepo = userRepo;
+        this.uatRepo = uatRepo;
+        this.contactRepository = contactRepository;
+        this.emailRepo = emailRepo;
+    }
+
     // User activation
     @GetMapping("/activateUser/{token}")
-    public String activateUser(Model m, @PathVariable String token, RedirectAttributes redirectAttrs) throws IOException {
+    public String activateUser(Model m, @PathVariable String token, RedirectAttributes redirectAttrs) {
         UserActivationToken uat = uatRepo.findByToken(token);
         if (uat == null) {
             redirectAttrs.addFlashAttribute("error", "Activation token doesn't exist!");
@@ -80,7 +83,7 @@ public class UserController {
 
     @PostMapping("/activateUser")
     @Transactional
-    public String activateUserPost(Model m, User user,Contact contact, RedirectAttributes redirectAttrs) throws IOException {
+    public String activateUserPost(User user, Contact contact, RedirectAttributes redirectAttrs) {
         User updateUser = userRepo.findByEmail(user.getEmail());
         updateUser.setActive(true);
 
@@ -115,7 +118,7 @@ public class UserController {
 
         Collection<? extends GrantedAuthority> roles = Collections.singletonList(new SimpleGrantedAuthority((userDetails.getUser().getRoleWithPrefix())));
         Collection<GrantedAuthority> ga = roleHierarchy.getReachableGrantedAuthorities(roles);
-        ArrayList<RoleEnum> reachableRoles = new ArrayList<RoleEnum>();
+        ArrayList<RoleEnum> reachableRoles = new ArrayList<>();
         for (GrantedAuthority role : ga) {
             reachableRoles.add(RoleEnum.getRoleWithoutPrefix(role.toString()));
         }
@@ -127,7 +130,7 @@ public class UserController {
 
     @Transactional
     @PostMapping("/dashboard/registerUser")
-    public String processRegister(HttpServletRequest request,Model m, User user, RedirectAttributes redirectAttrs) throws IOException {
+    public String processRegister(HttpServletRequest request, User user, RedirectAttributes redirectAttrs) {
         User userSearch = userRepo.findByEmail(user.appendCompanyEmail(user.getEmail()));
         UserActivationToken activeToken = uatRepo.findActiveByUserEmail(user.appendCompanyEmail(user.getEmail()));
         Contact contact = new Contact();
@@ -174,7 +177,7 @@ public class UserController {
 
     @GetMapping("/dashboard/users")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
-    public String listUsers(Model model, Authentication auth) {
+    public String listUsers(Model model) {
         List<User> listUsers = userRepo.findAll();
         model.addAttribute("listUsers", listUsers);
 
@@ -220,7 +223,7 @@ public class UserController {
 
     @GetMapping("/dashboard/user/edit/{id}")
     @PreAuthorize("hasRole('ROLE_OWNER')")
-    public String showPrivilegedUserEditForm(Model m, Authentication auth, @PathVariable long id) {
+    public String showPrivilegedUserEditForm(Model m, @PathVariable long id) {
         Optional<User> user = userRepo.findById(id);
         if(user.isEmpty()){
             m.addAttribute("error","User not found");
